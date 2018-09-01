@@ -108,6 +108,4 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-common.txt
-dev.txt
-prod.txt
+requirements/
