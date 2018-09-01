@@ -1,0 +1,112 @@
+<div class="form-group">
+    <input type="text" class="form-control" placeholder="Search">
+</div>
+<button type="submit" class="btn btn-default">Submit</button>
+<div id="posts" class="container-fluid">
+    
+</div>
+
+<div id="template" style="display: none;">
+    <div class="row">
+        <a v-bind:href="url">
+            <div class="post-item">
+              <div class="post-title">
+                  <h2>${ title }</h2>
+                  <span>${ update }</span>
+              </div>
+              <div class="post-summary">
+                  <p>${ summary }</p>
+              </div>
+              <div class="post-footer">
+                  <span>${ creat }</span>
+              </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.21.0/moment.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.21.0/locale/zh-cn.js"></script>
+
+<script type="text/javascript">
+    window.onload = function () {
+
+        $(window).scroll(function () {
+            var scrolltop = $(this).scrollTop();
+            var scrollheight = $(document).height();
+            var windowheight = $(this).height();
+
+            if (scrolltop + windowheight > scrollheight -100) {
+                getpost();
+            }
+        });
+        
+        getpost();
+    };
+
+
+
+
+    function getpost() {
+
+        if (typeof(nexturi) == 'undefined') {
+            nexturi = '/user/postlistjson/1'
+        }
+
+        if (nexturi == null) {
+            return;
+        }
+
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+
+            $.ajax({
+                type: 'GET',
+                url: nexturi,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.hasnext) {
+                            nexturi = result.nexturi;
+                        }
+                        else {
+                            nexturi = null;
+                        }
+
+                        var template_html = $('#template').html();
+
+                        for (var i = 0; i < result.posts.length; i++) {
+
+                            new Vue({
+                                el: '#template',
+                                data: {
+                                    url: result.posts[i].url,
+                                    title: result.posts[i].title,
+                                    update: moment(result.posts[i].update).fromNow(),
+                                    summary: result.posts[i].summary,
+                                    creat: moment(result.posts[i].creat).format('YYYY.MM.DD')
+                                },
+                                delimiters:['${', '}']});
+
+                            $('#posts').append($('#template').html());
+
+                            $('#template').html(template_html)
+                        }
+                    }
+
+                    issubmit = false;
+
+
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+</script>
+

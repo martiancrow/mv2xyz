@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}move to{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>你好, {% if current_user.is_authenticated %}{{ current_user.user.ua_user_nick }}{% else %}欢迎使用 move to 这是一个记录梦想的地方{% endif %}!</h1>
+</div>
+<div>
+    
+</div>
+{% endblock %}

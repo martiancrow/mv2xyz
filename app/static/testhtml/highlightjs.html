@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>hljs --test</title>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">  
+		<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet">
+		<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/agate.min.css" rel="stylesheet">
+		<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+		<script src="https://cdn.bootcss.com/highlight.js/9.12.0/languages/markdown.min.js"></script>
+		
+	</head>
+	<body>
+		
+		<div id="mv2_content" style="cursor:text;">
+			<textarea id="mv2_input" wrap="off" style="top: 0; height: 27px; width: 9px; left: 0;"></textarea>
+			<pre>
+# hello world
+
+you can write text [with links](http://example.com) inline or [link references][1].
+
+* one _thing_ has *em*phasis
+* two __things__ are **bold**
+
+[1]: http://example.com
+
+---
+
+hello world
+===========
+
+<this_is inline="xml"></this_is>
+
+> markdown is so cool
+
+    so are code segments
+
+1. one thing (yeah!)
+2. two thing `i can write code`, and `more` wipee!
+			</pre>
+		</div>	
+		<script type="text/javascript">
+
+			console.log(hljs)
+
+			//hljs.initHighlightingOnLoad();
+
+			var content = $('#mv2_content')
+
+			//console.log(edit_html.innerHTML)
+
+			//console.log(edit_html.textContent)
+
+            //hljs.highlightBlock(edit_html);
+
+            $('#mv2_content pre').each(function(i, block) {
+				hljs.highlightBlock(block);
+			});
+
+            //hljs.highlight(['markdown'], $('#edit').html)
+
+            //console.log(edit.html())
+            //var code = hljs.highlightAuto(edit_dom.innerHTML, ['markdown'])
+
+            //edit_dom.innerHTML = code.value
+
+            //console.log(code)
+
+
+
+			
+		</script>
+	</body>
+</html>

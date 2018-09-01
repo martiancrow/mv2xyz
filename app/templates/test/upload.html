@@ -1,0 +1,73 @@
+﻿{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Flasky{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Hello, This is test upload</h1>
+    <div>
+        <input id="fileupload" type="file" onchange="preview_file(this);">
+    </div>
+</div>
+
+<script type="text/javascript">
+    var paint = false;
+    var isSubmit = false;
+
+    function preview_file(_obj) {
+
+        if (_obj.files) {
+
+            for (var i = 0; i < _obj.files.length; i++) {
+
+                var fr = new FileReader();
+
+                fr.onload = (function (_file, _evt) {
+
+                    return function (_evt) {
+
+                        upload_blob(_file)
+                    }
+                })(_obj.files[i]);
+
+                fr.readAsDataURL(_obj.files[i])
+            }
+
+        }
+    }
+
+    function upload_blob(_file) {
+
+        console.log(_file)
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.addEventListener("load", function(evt) {
+
+            if (evt.currentTarget.status == 200) {
+                alert("200OK ")
+            }
+            
+        }, false);
+
+        xhr.addEventListener("error", function (evt) {
+            console.log("error ")
+        }, false);
+
+        xhr.addEventListener("abort", function () {
+            console.log("abort ")
+        }, false);
+
+        // 开始上传
+        xhr.open("POST", "/test/uploadfile/" + _file.name + "/" + _file.type, true);
+        xhr.send(_file);  
+        
+        
+
+    }
+</script>
+
+{% endblock %}
+
+
+

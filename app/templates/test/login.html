@@ -1,0 +1,15 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Flasky{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Hello, This is test login</h1>
+    <h2>user_id is {{current_user.sess.user_id}}</h2>
+    <div>
+    	{% for key, value in session.items() %}
+    		<div>session item: {{key}} = {{value}}</div>
+	    {% endfor %}
+    </div>
+</div>
+{% endblock %}

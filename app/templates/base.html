@@ -1,0 +1,89 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}mv2{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='common.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">Move To记事本</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('user.index') }}">笔记列表</a></li>
+                <li><a href="{{ url_for('user.add_post') }}">写笔记</a></li>
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if current_user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{{ current_user.user.gravatar(size=18) }}"/>
+                        个人中心 <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('user.profile') }}">个人资料</a></li>
+                        <li><a href="#">修改密码</a></li>
+                        <li><a href="#">修改邮件</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">注销</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">登录</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid content-warpper">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning" style="margin-top: 12px;">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}{% endblock %}
+</div>
+
+
+
+{% block page_foot %}
+<div class="content-foot" style="width: 100%;border-top: 1px solid #ddd;text-align: center;color: #777;font-size: 12px;">
+    <p>滇ICP备18001899号</p>
+</div>
+
+<script type="text/javascript">
+    window.onload = function () {
+        var minheight = $(window).height() - ($('.content-foot').height() + 1)
+        $('.content-warpper').css('min-height', minheight);
+    };
+</script>
+{% endblock %}
+
+{% endblock %}
+
+
+
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}move to - {{ user.username }}{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">
+    <div class="profile-header">
+        <h1>{{ user.username }}</h1>
+        <p>
+            {{ user.ua_user_nick }}<br>
+            {% if user.location %}
+                from <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a><br>
+            {% endif %}
+        </p>
+        <p>
+            {% if user == current_user.user %}
+            <a class="btn btn-default" href="#">编辑资料</a>
+            {% endif %}
+        </p>
+    </div>
+</div>
+<h3>Posts by {{ user.ua_user_nick }}</h3>
+{% include '_posts.html' %}
+{% endblock %}
