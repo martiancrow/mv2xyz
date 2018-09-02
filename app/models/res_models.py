@@ -8,7 +8,7 @@ import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request, after_this_request
-from sqlalchemy.dialects.mysql import LONGBLOB
+from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT
 from .. import db, login_manager
 
 class res_post(db.Model):
@@ -17,8 +17,8 @@ class res_post(db.Model):
     post_pid = db.Column(db.Integer, db.ForeignKey('res_posts.post_id'), default=0)
     author_id = db.Column(db.Integer, db.ForeignKey('ua_users.ua_user_id'))
     post_name = db.Column(db.String(64))
-    post_body_md = db.Column(db.Text)
-    post_body_html = db.Column(db.Text)
+    post_body_md = db.Column(LONGTEXT)
+    post_body_html = db.Column(LONGTEXT)
     post_updatetime = db.Column(db.DateTime(), default=datetime.utcnow)
     post_creattime = db.Column(db.DateTime(), default=datetime.utcnow)
     chilposts = db.relationship('res_post', lazy='dynamic', cascade="all, delete-orphan")
