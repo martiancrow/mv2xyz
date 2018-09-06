@@ -173,8 +173,8 @@
 
 				rendererMD.listitem = function(text) {
 	            	if (/^\s*\[[x\s]\]\s*/.test(text)) {
-		                text = text.replace(/^\s*\[\s\]\s*/, '<input type=\"checkbox\" /> ')
-		                           .replace(/^\s*\[x\]\s*/,  '<input type=\"checkbox\" checked disabled /> ');
+		               text = text.replace(/^\s*\[\s\]\s*/, '<input type=\"checkbox\" /> ')
+		                          .replace(/^\s*\[x\]\s*/,  '<input type=\"checkbox\" checked disabled /> ');
 
 		                return "<li>" + text + "</li>";
 		            }
@@ -183,13 +183,14 @@
 		                return "<li>" + text + "</li>";
 		            }
 		        };
+                
 
 				marked.setOptions({
 					renderer: rendererMD,
 			      	gfm: true,
 			      	tables: true,
 			      	breaks: false,
-			      	pedantic: true,
+			      	pedantic: false,
 			      	sanitize: false,
 			      	smartLists: false,
 			      	smartypants: false
