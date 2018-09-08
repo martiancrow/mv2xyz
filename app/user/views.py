@@ -159,8 +159,9 @@ def edit_post(postid):
     
     title = post.post_name
     content = post.post_body_md
+    updatetime = post.post_updatetime
 
-    return render_template('user/mdedit.html', title=title, content=content, postid=postid)
+    return render_template('user/mdedit.html', title=title, content=content, postid=postid, updatetime=updatetime)
 
 @user.route('/uploadimg/<file_name>/<path:type_name>', methods=['POST'])
 def upload_img(file_name, type_name):

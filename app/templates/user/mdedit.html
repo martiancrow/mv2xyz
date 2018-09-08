@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -69,6 +69,7 @@
 		<div class="warpper">
 			{% if postid %}
 			<input id="postid" type="hidden" value="{{ postid }}">
+            <input id="updatetime" type="hidden" value="{{ updatetime }}">
 			{% endif %}
 			
 			<div class="head">
@@ -143,6 +144,231 @@
 				</div>
 			</div>
 		</div>	
+        
+        <script type="text/javascript">
+   
+            function LocalDB () {
+                this.dbname = "mv2xyz";
+                this.dbver = 1;
+                
+                this._init_ = function () {
+                
+                    var request = indexedDB.open(this.dbname, this.dbver);
+                    
+                    request.onerror = function (event) {
+                        console.log("open fail:" + event.target.message);
+                    }.bind(this);
+                    
+                    request.onsuccess = function (event) {
+                        this.database = event.target.result;
+                        
+                        if (this.onload) {
+                            this.onload()
+                        }
+                        
+                       
+                    }.bind(this);
+                    
+                    request.onupgradeneeded = function(event) {
+                                    
+                        this.database = event.target.result;
+                        var objectstore = this.database.createObjectStore("content", { keyPath: "datakey" });
+
+                    }.bind(this);
+                    
+                    
+                    
+                };
+                
+                this.set = function (_datakey, _datavalue) {
+                
+                    var data = {
+                    
+                        datakey : _datakey,
+                        dataval : _datavalue
+                        
+                    }
+                                
+                    if (!this.database) {
+                        
+                        return false;
+                        
+                    }
+                    
+                    var transaction = this.database.transaction("content", "readwrite");
+                    var objectStore = transaction.objectStore("content");
+                    
+                    var getres = objectStore.get(_datakey);
+                    
+                    getres.onsuccess = function (e) {
+                    
+                        objectStore.put(data);
+                        
+                    };
+                    
+                    return true;
+                    
+                };
+                
+                this.del = function (_datakey) {
+                
+                    if (!this.database) {
+                    
+                        return false;
+                        
+                    }
+                
+                    var transaction = this.database.transaction("content", "readwrite");
+                    var objectStore = transaction.objectStore("content");
+                    objectStore.delete(_datakey);
+                    
+                    return true;
+                }
+                
+               
+                this.get = function (_datakey, _cb) {
+
+                    if (!this.database) {
+                        
+                        return false;
+                        
+                    }
+                                
+                    var transaction = this.database.transaction("content", "readwrite");
+                    var objectStore = transaction.objectStore("content");
+                    
+                    var request = objectStore.get(_datakey);
+
+                    
+                    
+                    request.onsuccess = function (e) {
+                        var result = e.target.result;
+
+                        
+                        
+                        if (_cb) {
+                        
+                            if (result) {
+                                _cb(result.dataval);
+                            }
+                            else {
+                                _cb(result);
+                            }
+                            
+                        }
+                    }
+                    
+                    request.onerror = function (e) {
+                        console.log(e)
+                    };
+                    
+                    return true;
+
+                }
+                
+                this._init_();
+
+            }
+        </script>
+        
+        <script type="text/javascript">
+   
+            function DocCache(_cme) {
+
+                this._init_ = function () {
+                    this._cme = _cme;
+                    this.db = new LocalDB();
+
+                    this.db.onload = function () {
+
+                        var postid = $("#postid").val();
+
+                        if (postid) {
+                            var datakey = "cache_" + postid;
+
+                            var res = this.db.get(datakey, function (_val) {
+                                if (_val) {
+
+                                    var updatetime = Date.parse(new Date($("#updatetime").val()));
+                                    var content = $("#mv2_input").val();
+
+                                    var localupdatetime = _val.updatetime;
+
+                                    if (localupdatetime > updatetime) {
+                                        if (confirm("监测到您上次未保存就退出,是否继续上次内容编辑")) {
+                                            content = _val.content;
+                                            updatetime = localupdatetime;
+                                            
+                                            this._cme.setValue(content);
+                                        }
+                                    }
+
+                                    var data = {
+                                        updatetime: updatetime,
+                                        content: content
+                                    };
+
+                                    this.db.set(datakey, data);
+                                }
+                                else {
+
+                                    var content = $("#mv2_input").val();
+                                    var updatetime = Date.parse(new Date($("#updatetime").val()));
+
+                                    var data = {
+                                        updatetime: updatetime,
+                                        content: content
+                                    };
+
+                                    console.log(data)
+
+                                    this.db.set(datakey, data);
+                                }
+                            }.bind(this));
+                        }
+                    }.bind(this);
+                    
+                };
+                
+                this.cache = function (_mdcode) {
+                    var postid = $("#postid").val();
+                        
+                    if (postid) {
+                        var datakey = "cache_" + postid;
+                        
+                        var content = _mdcode;
+                        var updatetime = Date.parse(new Date());
+                        
+                        var data = {
+                            updatetime : updatetime,
+                            content : content
+                        };
+                                
+                        this.db.set(datakey, data);
+                        
+                        
+                    }
+                    
+                };
+                
+                this.save = function () {
+                    var postid = $("#postid").val();
+                        
+                    if (postid) {
+                        var datakey = "cache_" + postid;
+ 
+                        this.db.del(datakey);
+                        
+                        
+                    }
+                    
+                };
+                
+                this._init_();
+
+            }
+        </script>
+        
 		<script type="text/javascript">
 		
 			document.onkeydown = function () {
@@ -164,13 +390,14 @@
 
 			function initEdit () {
 
-
 				var mv2input = document.getElementById('mv2_input');
 				var maxec = 0;
 
 				CodeMirrorEditor = CodeMirror.fromTextArea(mv2input, {
 					lineWrapping: true
 				});
+
+				dc = new DocCache(CodeMirrorEditor);
 
 				var rendererMD = new marked.Renderer();
 
@@ -203,6 +430,7 @@
 
 				CodeMirrorEditor.on('change', function () {
 					$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
+                    dc.cache(CodeMirrorEditor.getValue())
 
 					var ec = CodeMirrorEditor.changeGeneration();
 
@@ -588,6 +816,7 @@
 
   							if (result) {
   								if (result.code == 200) {
+                                    dc.save();
   									window.location.href = result.nexturl;
   								}
   							}
