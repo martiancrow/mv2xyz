@@ -2,9 +2,9 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<meta name="format-detection" content="telephone=no">
 
 		<title>mv2 -- edit</title>
@@ -21,19 +21,21 @@
 		<script src="https://cdn.bootcss.com/codemirror/5.36.0/mode/xml/xml.min.js"></script>
 		<script src="https://cdn.bootcss.com/marked/0.3.19/marked.min.js"></script>
 		<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="https://cdn.bootcss.com/iScroll/5.2.0/iscroll.js"></script>
         
         
 		
 		<style type="text/css">
 			html, body {height: 100%;font-size:14px;}
             .CodeMirror {font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
-			.warpper {width: 100%;height: 100%;top: 0;position: absolute;background-color: #ddd;float: left;}
+			.warpper {width: 100%;height: 100%;top: 0;background-color: #ddd;float: left;}
 			.title {width: 100%;height: 50px;padding-left: 12px;overflow: hidden;border-bottom: 1px solid #ddd;float: left;background-color: #fff;box-sizing: border-box;}
-			.title input[type=text] {width: 100%;height: 100%;border: 0px;font-size: 27px;line-height: 50px;}
-			.content {width: 100%;padding-left: 12px;box-sizing: border-box;float: left;background-color: #fff;}
+			.title input[type=text] {width: 100%;height: 100%;border: 0px;font-size: 26px;line-height: 49px;}
+			.content {-webkit-overflow-scrolling: touch;width: 100%;padding-left: 12px;box-sizing: border-box;float: left;background-color: #fff;}
 
 			.preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;}
-			.markdown-body {width: 100%;overflow: auto;padding: 0 12px;box-sizing: border-box;float: left;}
+            #md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;}
+			.markdown-body {width: 100%;overflow: hidden;padding: 18px 12px;box-sizing: border-box;float: left;}
 			.preview-foot {width: 100%;height: 35px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}
 			.preview-foot i {line-height: 35px;float: left;cursor: pointer;}
 			.preview-foot .tools-left {margin-left: 10px;height: 100%;float: left;overflow: hidden;}
@@ -47,7 +49,7 @@
 			.head .tools-right .disable:before{color:#c0c0c0;}
 			.head .tools-right .save{margin-left: 10px;}
 			
-			.foot {width: 100%;height: 35px;background-color: #fff;border-top: 1px solid #ddd;float: left;bottom: 0;position: absolute;overflow: hidden;z-index: 999;}
+			.foot {width: 100%;height: 35px;background-color: #fff;border-top: 1px solid #ddd;float: left;overflow: hidden;z-index: 999;}
 			.foot .toolsbar {width: 100%;height: 35px;position: relative;float: left;border-bottom: 1px solid #ddd;box-sizing: border-box;}
 			.foot .toolsbar i {line-height: 35px;cursor: pointer;}
 
@@ -88,7 +90,7 @@
 			<div class="content">
 				<textarea id="mv2_input">{% if content %}{{ content }}{% endif %}</textarea>
 			</div>
-			<div class="foot">
+			<div id="foot" class="foot">
 				<div class="toolsbar">
 					<div class="tools-left">
 						<div id="foot-tools-left-wrapper"  class="tools-left-warpper">
@@ -133,7 +135,9 @@
 				</div>		
 			</div>
 			<div class="preview">
-				<div class="markdown-body"></div>
+                <div id="md-wrapper">
+                    <div class="markdown-body"></div>
+                </div>
 				<div class="preview-foot">
 					<div class="tools-left">
 						<i id="del-post" class="fa fa-trash-o fa-lg"></i>
@@ -144,6 +148,141 @@
 				</div>
 			</div>
 		</div>	
+        
+        <script type="text/javascript">
+        
+            function screenHelper (_edit) {
+            
+                function _init_ () {
+                    this._edit = _edit;
+                }
+            
+            }
+           
+            $(window).scroll(function(event) {
+                //console.log("scrollTop:" + $('body').scrollTop());
+                //console.log("innerHeight:" + window.innerHeight);
+                heightLoop();
+            });
+            
+            
+            var isPreven = false;
+            var loadcontentHeight = 0;
+            var loadinnerHeight = 0;
+            var keyHeight = 0;
+            var keyoutcontentHeight = 0;
+            
+            
+            
+            
+            _checkDriver()
+            
+            function _checkDriver () {
+                var ua = navigator.userAgent; 
+                var app = navigator.appVersion;
+                
+                if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                    alert("ios")
+                }
+                else {
+                    alert("other")
+                }
+                
+                
+            }
+            
+            function _prevenMove () {
+                $('body').bind('touchmove', function (e) {
+                    console.log("body touchmove:" + $('body').scrollTop())
+			    	e.preventDefault();
+			    });
+            }
+            
+            function preventChange () {
+                isPreven = true;
+            }
+            
+            function acceptChange () {
+                isPreven = false;
+            }
+            
+            
+            function onlLoadHeight () {
+                loadcontentHeight = $('.content').height();
+                loadinnerHeight = window.innerHeight;
+                _prevenMove();
+            }
+            
+            
+            function heightLoop () {
+                if ($('body').scrollTop() > keyHeight && window.innerHeight != loadinnerHeight) {
+                    keyHeight = $('body').scrollTop();                    
+                    keyoutcontentHeight = loadcontentHeight - keyHeight;
+                }
+            }
+            
+            function _openKey () {
+                if ($('.content').height() > keyoutcontentHeight) {
+                    if (loadcontentHeight != 0 && keyoutcontentHeight != 0) {
+                        _setcontentHeight();
+                    }
+                    else {
+                        document.getElementById("foot").scrollIntoView();
+                        setTimeout("_setcontentHeight()", 1000);
+                    }
+                }
+            }
+            
+            function _closeKey () {
+                var tbxTitle = $("#title")[0];
+                var tbxContent = $(".content")[0];
+                
+                var titleFocus = (document.activeElement == tbxTitle);
+                var contentFocus = (document.activeElement == tbxContent);
+                
+                //console.log("titleFocus:" + titleFocus)
+                //console.log("contentFocus:" + contentFocus)
+                //console.log("isPreven:" + isPreven)
+                
+                if (!titleFocus && !contentFocus) {
+                    if (!isPreven) {
+                        if ($('.content').height() <= keyoutcontentHeight) {
+                            _setcontentHeight();
+                        }
+                    }
+                }
+                
+                acceptChange();
+            }
+            
+            function onKeyChange (_type) {
+
+                if (_type == "open") {
+                    _openKey();
+                }
+                else {
+                    setTimeout("_closeKey()", 100);
+                }
+
+            }
+            
+            function _setcontentHeight() {
+                if ($('.content').height() > keyoutcontentHeight) {
+                    $('.content').height(keyoutcontentHeight);
+                    CodeMirrorEditor.setSize('auto', keyoutcontentHeight + 'px');
+                }
+                else
+                {
+                    $('.content').height(loadcontentHeight);
+                    CodeMirrorEditor.setOption("readOnly", "nocursor");
+                    CodeMirrorEditor.setSize('auto', loadcontentHeight + 'px');
+                    CodeMirrorEditor.setOption("readOnly", false);
+                }
+                
+                $('body').scrollTop(0);
+
+            }
+        </script>
         
         <script type="text/javascript">
    
@@ -273,10 +412,10 @@
         
         <script type="text/javascript">
    
-            function DocCache(_cme) {
+            function DocCache(_edit) {
 
                 this._init_ = function () {
-                    this._cme = _cme;
+                    this._edit = _edit;
                     this.db = new LocalDB();
 
                     this.db.onload = function () {
@@ -299,7 +438,7 @@
                                             content = _val.content;
                                             updatetime = localupdatetime;
                                             
-                                            this._cme.setValue(content);
+                                            this._edit.setValue(content);
                                         }
                                     }
 
@@ -319,8 +458,6 @@
                                         updatetime: updatetime,
                                         content: content
                                     };
-
-                                    console.log(data)
 
                                     this.db.set(datakey, data);
                                 }
@@ -382,10 +519,12 @@
 			window.onload = function () {
 				initEdit();
 				setSize();
+                onlLoadHeight();
 			};
 
 			window.onresize = function () {
-				setSize();
+                //mark
+				//setSize();
 			};
 
 			function initEdit () {
@@ -413,7 +552,6 @@
 		                return "<li>" + text + "</li>";
 		            }
 		        };
-                
 
 				marked.setOptions({
 					renderer: rendererMD,
@@ -427,7 +565,9 @@
 			    });
 
 				//CodeMirrorEditor.setOption('lineNumbers', true);
-
+                
+                //CodeMirrorEditor.inputStyle
+                
 				CodeMirrorEditor.on('change', function () {
 					$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
                     dc.cache(CodeMirrorEditor.getValue())
@@ -456,13 +596,55 @@
 				
 				CodeMirrorEditor.on('focus', function () {
 					//$('.foot').height(35);
+                    //$('body').scrollTop(1000)
+                    //document.getElementById("foot").scrollIntoView();
+                    //setTimeout("iosSetKey()", 1000)
+                    //mark
+                    onKeyChange("open");
+
 				});
+                
+                CodeMirrorEditor.on('blur', function () {
+					//$('.foot').height(35);
+                    //setTimeout("console.log(window.innerHeight)", 1000)
+                    //setTimeout("iosSetKey()", 1000)
+                    //mark
+                    onKeyChange("close");
+                    
+                });
+                
+                $("#title").bind('focus', function () {
+                    //mark
+                    onKeyChange("open");
+                });
+                
+                $("#title").bind('blur', function () {
+                    //mark
+                    //CodeMirrorEditor.focus();
+                    onKeyChange("close");
+                });
 
 				if ($('#postid').length == 0) {
 					hidePreview();
 				}
 
 				$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
+                
+                //要在确保内容渲染后执行,否则不会滚动
+                /*
+                var myScroll = new IScroll('#md-wrapper', {
+                    preventDefault: false,
+                    hScrollbar:false,  //禁止横向滚动
+                    vScroll:true,      //为true时允许y轴滚动
+                    bounce:false,      //当滚动器到达容器边界时他将执行一个小反弹动画。在老的或者性能低的设备上禁用反弹对实现平滑的滚动有帮助。
+                    click:true,    　   //如果你想你的应用程序响应click事件，那么该设置次属性为true
+                    hideScrollbar: false, //是否隐藏滚动条  
+                    mouseWheel: true
+                });
+                
+                console.log(myScroll)
+                */
+                
 
 				$('#head-goback').bind('click', function () {
 					history.go(-1);
@@ -499,6 +681,7 @@
 				
 
 				$('#insert-head').bind('click', function () {
+                    preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					var token = CodeMirrorEditor.getRange({line: cursor.line, ch: cursor.ch - 2}, {line: cursor.line, ch: cursor.ch});
 
@@ -532,12 +715,13 @@
 					hideKeyboard();
 
 					var footheight = $('#upload-file').height() + 35 + 1;
+                    $('.foot').height(footheight)
 
 					if ($('.foot').height() > 35) {
 						footheight = 35;
 					}
 
-					$('.foot').animate({height: footheight}, 300);
+					//$('.foot').animate({height: footheight}, 300);
 
 				});
 
@@ -657,7 +841,8 @@
 			        }
 
 			    });
-
+                
+                
 
 			}
 
@@ -710,13 +895,16 @@
 		    }
 
 			function setSize() {
+                //console.log("setSize")
 				var initfootheight = 35;
-				var content_height = $('.warpper').height() - ($('.title').height() + 1) - $('.head').height() - initfootheight;
+                //var viewHeight = window.innerHeight;
+                var viewHeight = $('.warpper').height();
+				var content_height = viewHeight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
 				$('.content').height(content_height);
 				CodeMirrorEditor.setSize('auto', content_height + 'px');
 
-				var markdown_body_height = $('.preview').height() - ($('.preview-foot').height() + 1);
-				$('.markdown-body').height(markdown_body_height);
+				var md_wrapper_height = $('.preview').height() - ($('.preview-foot').height() + 1);
+				$('#md-wrapper').height(md_wrapper_height);
 
 				var foot_tools_wrapper_width = 0;
 

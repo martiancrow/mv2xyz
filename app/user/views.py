@@ -159,7 +159,7 @@ def edit_post(postid):
     
     title = post.post_name
     content = post.post_body_md
-    updatetime = post.post_updatetime
+    updatetime = post.post_updatetime.strftime("%Y/%m/%d %H:%M:%S")
 
     return render_template('user/mdedit.html', title=title, content=content, postid=postid, updatetime=updatetime)
 
