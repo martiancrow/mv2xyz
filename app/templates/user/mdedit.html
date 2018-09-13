@@ -153,135 +153,180 @@
         
             function screenHelper (_edit) {
             
-                function _init_ () {
+                this._init_ = function () {
                     this._edit = _edit;
-                }
-            
-            }
-           
-            $(window).scroll(function(event) {
-                //console.log("scrollTop:" + $('body').scrollTop());
-                //console.log("innerHeight:" + window.innerHeight);
-                heightLoop();
-            });
-            
-            
-            var isPreven = false;
-            var loadcontentHeight = 0;
-            var loadinnerHeight = 0;
-            var keyHeight = 0;
-            var keyoutcontentHeight = 0;
-            
-            
-            
-            
-            _checkDriver()
-            
-            function _checkDriver () {
-                var ua = navigator.userAgent; 
-                var app = navigator.appVersion;
-                
-                if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
-                    alert("ios")
-                }
-                else {
-                    alert("other")
-                }
-                
-                
-            }
-            
-            function _prevenMove () {
-                $('body').bind('touchmove', function (e) {
-                    console.log("body touchmove:" + $('body').scrollTop())
-			    	e.preventDefault();
-			    });
-            }
-            
-            function preventChange () {
-                isPreven = true;
-            }
-            
-            function acceptChange () {
-                isPreven = false;
-            }
-            
-            
-            function onlLoadHeight () {
-                loadcontentHeight = $('.content').height();
-                loadinnerHeight = window.innerHeight;
-                _prevenMove();
-            }
-            
-            
-            function heightLoop () {
-                if ($('body').scrollTop() > keyHeight && window.innerHeight != loadinnerHeight) {
-                    keyHeight = $('body').scrollTop();                    
-                    keyoutcontentHeight = loadcontentHeight - keyHeight;
-                }
-            }
-            
-            function _openKey () {
-                if ($('.content').height() > keyoutcontentHeight) {
-                    if (loadcontentHeight != 0 && keyoutcontentHeight != 0) {
-                        _setcontentHeight();
+                    this._isPreven = false;
+                    this._keyoutcontentHeight = 0;
+                    this._keyHeight = 0;
+                    
+                    this._checkDriver();
+                    this._onlLoadHeight();
+                    this._setSize();
+                    this._prevenMove();
+                                                            
+                    if (this._drvtype  == 'ios') {
+                    
+                        $(window).scroll(function(event) {
+                            this._heightLoop();
+                        }.bind(this));
+                        
+                        this._edit.on('focus', function () {
+                            this.onKeyChange("open");
+                        }.bind(this));
+                        
+                        this._edit.on('blur', function () {
+                            this.onKeyChange("close");
+                        }.bind(this));
+                        
+                        $("#title").bind('focus', function () {
+                            this.onKeyChange("open");
+                        }.bind(this));
+                        
+                        $("#title").bind('blur', function () {
+                            //this._edit.focus();
+                            this.onKeyChange("close");
+                        }.bind(this));
+                        
+                        this._onlLoadHeight();
+
                     }
                     else {
-                        document.getElementById("foot").scrollIntoView();
-                        setTimeout("_setcontentHeight()", 1000);
+                        window.onresize = function () {
+                            this._setSize();
+                        }.bind(this);
                     }
-                }
-            }
-            
-            function _closeKey () {
-                var tbxTitle = $("#title")[0];
-                var tbxContent = $(".content")[0];
+
+                };
                 
-                var titleFocus = (document.activeElement == tbxTitle);
-                var contentFocus = (document.activeElement == tbxContent);
+                this._onlLoadHeight = function () {
+                    this._loadcontentHeight = $('.content').height();
+                    this._loadinnerHeight = window.innerHeight;
+                };
+
+                this._checkDriver = function () {
+                    var ua = navigator.userAgent; 
+                    var app = navigator.appVersion;
+                    
+                    if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                        this._drvtype  = 'ios';
+                    }
+                    else {
+                        this._drvtype  = 'other';
+                    }
+
+                };
                 
-                //console.log("titleFocus:" + titleFocus)
-                //console.log("contentFocus:" + contentFocus)
-                //console.log("isPreven:" + isPreven)
+                this._prevenMove = function () {
+                    $('body').bind('touchmove', function (e) {
+                        e.preventDefault();
+                    }.bind(this));
+                };
                 
-                if (!titleFocus && !contentFocus) {
-                    if (!isPreven) {
-                        if ($('.content').height() <= keyoutcontentHeight) {
-                            _setcontentHeight();
+                this._openKey = function () {
+                
+                    if ($('.content').height() > this._keyoutcontentHeight) {
+                        if (this._loadcontentHeight && this._keyoutcontentHeight) {
+                            this._setcontentHeight();
+                        }
+                        else {
+                            document.getElementById("foot").scrollIntoView();
+                            setTimeout(this._setcontentHeight.bind(this), 1000);
                         }
                     }
-                }
+                };
                 
-                acceptChange();
-            }
-            
-            function onKeyChange (_type) {
-
-                if (_type == "open") {
-                    _openKey();
-                }
-                else {
-                    setTimeout("_closeKey()", 100);
-                }
-
-            }
-            
-            function _setcontentHeight() {
-                if ($('.content').height() > keyoutcontentHeight) {
-                    $('.content').height(keyoutcontentHeight);
-                    CodeMirrorEditor.setSize('auto', keyoutcontentHeight + 'px');
-                }
-                else
-                {
-                    $('.content').height(loadcontentHeight);
-                    CodeMirrorEditor.setOption("readOnly", "nocursor");
-                    CodeMirrorEditor.setSize('auto', loadcontentHeight + 'px');
-                    CodeMirrorEditor.setOption("readOnly", false);
-                }
+                this._closeKey = function () {
+                    var tbxTitle = $("#title")[0];
+                    var tbxContent = $(".content")[0];
+                    
+                    var titleFocus = (document.activeElement == tbxTitle);
+                    var contentFocus = (document.activeElement == tbxContent);
+                    
+                    if (!titleFocus && !contentFocus) {
+                        if (!this._isPreven) {
+                            if ($('.content').height() <= this._keyoutcontentHeight) {
+                                this._setcontentHeight();
+                            }
+                        }
+                    }
+                    
+                    this.acceptChange();
+                };
                 
-                $('body').scrollTop(0);
+                
+                
+                this._setcontentHeight = function () {
+                
+                
+                    if ($('.content').height() > this._keyoutcontentHeight) {
+                        $('.content').height(this._keyoutcontentHeight);
+                        this._edit.setSize('auto', this._keyoutcontentHeight + 'px');
+                    }
+                    else
+                    {
+                        $('.content').height(this._loadcontentHeight);
+                        this._edit.setOption("readOnly", "nocursor");
+                        this._edit.setSize('auto', this._loadcontentHeight + 'px');
+                        this._edit.setOption("readOnly", false);
+                    }
+                    
+                    $('body').scrollTop(0);
 
+                };
+                
+                this._heightLoop = function () {
+                    if ($('body').scrollTop() > this._keyHeight && window.innerHeight != this._loadinnerHeight) {
+                        this._keyHeight = $('body').scrollTop();                    
+                        this._keyoutcontentHeight = this._loadcontentHeight - this._keyHeight;
+                    }
+                };
+                
+                this._setSize = function () {
+
+                    var initfootheight = $('#foot').height() + 1; //broadheight
+                    
+                    var viewHeight = $('.warpper').height();
+                    var content_height = viewHeight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
+                    $('.content').height(content_height);
+                    CodeMirrorEditor.setSize('auto', content_height + 'px');
+
+                    var md_wrapper_height = $('.preview').height() - ($('.preview-foot').height() + 1);
+                    $('#md-wrapper').height(md_wrapper_height);
+
+                    var foot_tools_wrapper_width = 0;
+
+                    for (var i = 0; i < $('.tools-left-warpper i').length; i++) {
+                        foot_tools_wrapper_width += $($('.tools-left-warpper i')[i]).width() + 25 + 1; //span spaces
+                    }
+
+                    $('.tools-left-warpper').width(foot_tools_wrapper_width);
+                };
+                
+                this.preventChange = function () {
+                    this._isPreven = true;
+                };
+                
+                this.acceptChange = function () {
+                    this._isPreven = false;
+                };
+                
+                this.onKeyChange = function (_type) {
+
+                    if (_type == "open") {
+                        this._openKey();
+                    }
+                    else {
+                        setTimeout(this._closeKey.bind(this), 100);
+                    }
+
+                };
+                
+                
+                this._init_();
+                
+            
             }
+
         </script>
         
         <script type="text/javascript">
@@ -518,13 +563,8 @@
 
 			window.onload = function () {
 				initEdit();
-				setSize();
-                onlLoadHeight();
-			};
+                
 
-			window.onresize = function () {
-                //mark
-				//setSize();
 			};
 
 			function initEdit () {
@@ -537,6 +577,7 @@
 				});
 
 				dc = new DocCache(CodeMirrorEditor);
+                sch = new screenHelper(CodeMirrorEditor);
 
 				var rendererMD = new marked.Renderer();
 
@@ -593,36 +634,6 @@
 					}
 
 				});
-				
-				CodeMirrorEditor.on('focus', function () {
-					//$('.foot').height(35);
-                    //$('body').scrollTop(1000)
-                    //document.getElementById("foot").scrollIntoView();
-                    //setTimeout("iosSetKey()", 1000)
-                    //mark
-                    onKeyChange("open");
-
-				});
-                
-                CodeMirrorEditor.on('blur', function () {
-					//$('.foot').height(35);
-                    //setTimeout("console.log(window.innerHeight)", 1000)
-                    //setTimeout("iosSetKey()", 1000)
-                    //mark
-                    onKeyChange("close");
-                    
-                });
-                
-                $("#title").bind('focus', function () {
-                    //mark
-                    onKeyChange("open");
-                });
-                
-                $("#title").bind('blur', function () {
-                    //mark
-                    //CodeMirrorEditor.focus();
-                    onKeyChange("close");
-                });
 
 				if ($('#postid').length == 0) {
 					hidePreview();
@@ -681,7 +692,7 @@
 				
 
 				$('#insert-head').bind('click', function () {
-                    preventChange();
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					var token = CodeMirrorEditor.getRange({line: cursor.line, ch: cursor.ch - 2}, {line: cursor.line, ch: cursor.ch});
 
@@ -704,6 +715,7 @@
 				});
 
 				$('#insert-bold').bind('click', function () {
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('****')
 					CodeMirrorEditor.focus();					
@@ -726,6 +738,7 @@
 				});
 
 				$('#insert-quote').bind('click', function () {
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('```\n\n```')
 					CodeMirrorEditor.focus();					
@@ -733,6 +746,7 @@
 				});
 
 				$('#insert-terminal').bind('click', function () {
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('> ')
 					CodeMirrorEditor.focus();					
@@ -740,6 +754,7 @@
 				});
 
 				$('#insert-add').bind('click', function () {
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('+')
 					CodeMirrorEditor.focus();					
@@ -747,6 +762,8 @@
 				});
 
 				$('#insert-minus').bind('click', function () {
+                    //expire
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('-')
 					CodeMirrorEditor.focus();					
@@ -754,6 +771,8 @@
 				});
 
 				$('#insert-percent').bind('click', function () {
+                    //expire
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('%')
 					CodeMirrorEditor.focus();					
@@ -761,6 +780,8 @@
 				});
 
 				$('#insert-exclamation').bind('click', function () {
+                    //expire
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('!')
 					CodeMirrorEditor.focus();					
@@ -768,6 +789,8 @@
 				});
 
 				$('#insert-code').bind('click', function () {
+                    //expire
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection(':% %:')
 					CodeMirrorEditor.focus();					
@@ -775,6 +798,8 @@
 				});
 
 				$('#insert-indent').bind('click', function () {
+                    //expire
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('\t')
 					CodeMirrorEditor.focus();					
@@ -782,6 +807,7 @@
 				});
 
 				$('#insert-link').bind('click', function () {
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('![](http://)')
 					CodeMirrorEditor.focus();					
@@ -789,6 +815,7 @@
 				});
 
 				$('#insert-check').bind('click', function () {
+                    sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('- [x] ')
 					CodeMirrorEditor.focus();					
@@ -894,26 +921,7 @@
 		        }
 		    }
 
-			function setSize() {
-                //console.log("setSize")
-				var initfootheight = 35;
-                //var viewHeight = window.innerHeight;
-                var viewHeight = $('.warpper').height();
-				var content_height = viewHeight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
-				$('.content').height(content_height);
-				CodeMirrorEditor.setSize('auto', content_height + 'px');
-
-				var md_wrapper_height = $('.preview').height() - ($('.preview-foot').height() + 1);
-				$('#md-wrapper').height(md_wrapper_height);
-
-				var foot_tools_wrapper_width = 0;
-
-				for (var i = 0; i < $('.tools-left-warpper i').length; i++) {
-					foot_tools_wrapper_width += $($('.tools-left-warpper i')[i]).width() + 25 + 1;
-				}
-
-				$('.tools-left-warpper').width(foot_tools_wrapper_width);
-			}
+			
 
 			function showPreview() {
 				$('.preview').show();
