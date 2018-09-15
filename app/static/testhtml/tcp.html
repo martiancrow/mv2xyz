@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="format-detection" content="telephone=no">
+
+		<title>hljs --test</title>
+
+		<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+		
+	</head>
+	<body>
+		<div id="input" contentEditable="true">
+			
+		</div>	
+		
+	</body>
+    
+</html>
+
+<script type="text/javascript">
+
+
+    $("#input").bind("compositionstart", function (e) {
+        console.log("compositionstart")
+    });
+
+    $("#input").bind("compositionupdate", function (e) {
+        console.log("compositionupdate")
+    });
+
+    $("#input").bind("compositionend", function (e) {
+        console.log("compositionend")
+    });
+
+    $("#input").bind("input", function (e) {
+        console.log("input")
+    });
+</script>

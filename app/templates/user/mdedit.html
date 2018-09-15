@@ -10,18 +10,20 @@
 		<title>mv2 -- edit</title>
 
         <link href="{{ url_for('static', filename='common.css') }}" rel="stylesheet">
-		<link href="https://cdn.bootcss.com/codemirror/5.36.0/codemirror.min.css" rel="stylesheet">
+		<link href="https://cdn.bootcss.com/codemirror/5.38.0/codemirror.min.css" rel="stylesheet">
 		<link href="https://cdn.bootcss.com/github-markdown-css/2.10.0/github-markdown.min.css" rel="stylesheet">
 		<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 		<link href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
 
 		<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-		<script src="https://cdn.bootcss.com/codemirror/5.36.0/codemirror.min.js"></script>
-		<script src="https://cdn.bootcss.com/codemirror/5.36.0/mode/markdown/markdown.min.js"></script>
-		<script src="https://cdn.bootcss.com/codemirror/5.36.0/mode/xml/xml.min.js"></script>
+        <script src="{{ url_for('static', filename='codemirror_5.38.0.js') }}"></script>
+		<!--<script src="https://cdn.bootcss.com/codemirror/5.38.0/codemirror.min.js"></script>-->
+		<script src="https://cdn.bootcss.com/codemirror/5.38.0/mode/markdown/markdown.min.js"></script>
+		<script src="https://cdn.bootcss.com/codemirror/5.38.0/mode/xml/xml.min.js"></script>
 		<script src="https://cdn.bootcss.com/marked/0.3.19/marked.min.js"></script>
 		<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
         <script src="https://cdn.bootcss.com/iScroll/5.2.0/iscroll.js"></script>
+        
         
         
 		
@@ -31,10 +33,11 @@
 			.warpper {width: 100%;height: 100%;top: 0;background-color: #ddd;float: left;}
 			.title {width: 100%;height: 50px;padding-left: 12px;overflow: hidden;border-bottom: 1px solid #ddd;float: left;background-color: #fff;box-sizing: border-box;}
 			.title input[type=text] {width: 100%;height: 100%;border: 0px;font-size: 26px;line-height: 49px;}
-			.content {-webkit-overflow-scrolling: touch;width: 100%;padding-left: 12px;box-sizing: border-box;float: left;background-color: #fff;}
+			.content {width: 100%;padding-left: 12px;box-sizing: border-box;float: left;background-color: #fff;overflow:hidden;position:relative}
+            #mv2_input {display: none;}
 
 			.preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;}
-            #md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;}
+            #md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;position:relative}
 			.markdown-body {width: 100%;overflow: hidden;padding: 18px 12px;box-sizing: border-box;float: left;}
 			.preview-foot {width: 100%;height: 35px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}
 			.preview-foot i {line-height: 35px;float: left;cursor: pointer;}
@@ -73,6 +76,7 @@
 			<input id="postid" type="hidden" value="{{ postid }}">
             <input id="updatetime" type="hidden" value="{{ updatetime }}">
 			{% endif %}
+            <textarea id="mv2_input">{% if content %}{{ content }}{% endif %}</textarea>
 			
 			<div class="head">
 				<div class="tools-left">
@@ -88,7 +92,7 @@
 				<input id="title" type="text" name="title" placeholder="请输入标题" value="{% if title %}{{ title }}{% endif %}" />
 			</div>
 			<div class="content">
-				<textarea id="mv2_input">{% if content %}{{ content }}{% endif %}</textarea>
+				
 			</div>
 			<div id="foot" class="foot">
 				<div class="toolsbar">
@@ -148,22 +152,109 @@
 				</div>
 			</div>
 		</div>	
+        <script type="text/javascript">
+        
+            function utilTools () {
+            
+                var outs = new Object;
+            
+                outs.checkDriver = function () {
+                
+                    var ua = navigator.userAgent; 
+                    var app = navigator.appVersion;
+                    
+                    if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                        return 'ios';
+                    }
+                    else if (ua.indexOf('Android') > -1 || ua.indexOf('Linux') > -1) {
+                        return 'android'
+                    }
+                    else {
+                        return  'other';
+                    }
+
+                };
+                
+                return outs;
+            }
+        
+        </script>
+        
         
         <script type="text/javascript">
         
-            function screenHelper (_edit) {
+            function scrollHelper (_edit) {
             
                 this._init_ = function () {
                     this._edit = _edit;
+                    this._drvtype = utilTools().checkDriver();
+                    
+                    if (this._drvtype == "ios") {
+                        $("#md-wrapper").css("overflow-y", "hidden");
+                        
+                        this._htmlScroll = new IScroll('#md-wrapper', {
+                            preventDefault: false,
+                            hScrollbar: false,  
+                            vScroll: true,      
+                            bounce: true,      
+                            click: true,    　     //如果你想你的应用程序响应click事件，那么该设置次属性为true
+                            mouseWheel: false,
+                            fadeScrollbars: true,
+                            scrollbars: true
+                        });
+                                                
+                        this._editScroll = new IScroll('.content', {
+                            preventDefault: false,
+                            hScrollbar: false,  
+                            vScroll: true,      
+                            bounce: true,      
+                            click: true,    　     //如果你想你的应用程序响应click事件，那么该设置次属性为true
+                            mouseWheel: false,
+                            fadeScrollbars: true,
+                            scrollbars: true
+                        });
+                        
+                        
+                    }
+
+                }
+                
+                this.refReshHtml = function () {
+                    if (this._drvtype == "ios") {
+                        setTimeout(function () {
+                            this._htmlScroll.refresh();
+                        }.bind(this), 0);
+                    }
+                };
+                
+                this.refReshEdit = function () {
+                    if (this._drvtype == "ios") {
+                        setTimeout(function () {
+                            this._editScroll.refresh();
+                        }.bind(this), 0);
+                    }
+                };
+                
+                this._init_();
+            }
+            
+        </script>
+        <script type="text/javascript">
+        
+            function screenHelper (_edit, _scroll) {
+            
+                this._init_ = function () {
+                    this._edit = _edit;
+                    this._scroll = _scroll;
                     this._isPreven = false;
                     this._keyoutcontentHeight = 0;
                     this._keyHeight = 0;
                     
-                    this._checkDriver();
+                    this._drvtype = utilTools().checkDriver();
                     this._onlLoadHeight();
                     this._setSize();
                     this._prevenMove();
-                                                            
+                                                                                
                     if (this._drvtype  == 'ios') {
                     
                         $(window).scroll(function(event) {
@@ -172,6 +263,7 @@
                         
                         this._edit.on('focus', function () {
                             this.onKeyChange("open");
+                            
                         }.bind(this));
                         
                         this._edit.on('blur', function () {
@@ -188,6 +280,13 @@
                         }.bind(this));
                         
                         this._onlLoadHeight();
+                        
+                        window.onorientationchange = function () {
+                            this._setSize();
+                        }.bind(this);
+                        
+                        this._scroll.refReshHtml();
+                        this._scroll.refReshEdit();
 
                     }
                     else {
@@ -203,18 +302,7 @@
                     this._loadinnerHeight = window.innerHeight;
                 };
 
-                this._checkDriver = function () {
-                    var ua = navigator.userAgent; 
-                    var app = navigator.appVersion;
-                    
-                    if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
-                        this._drvtype  = 'ios';
-                    }
-                    else {
-                        this._drvtype  = 'other';
-                    }
-
-                };
+                
                 
                 this._prevenMove = function () {
                     $('body').bind('touchmove', function (e) {
@@ -240,7 +328,7 @@
                     var tbxContent = $(".content")[0];
                     
                     var titleFocus = (document.activeElement == tbxTitle);
-                    var contentFocus = (document.activeElement == tbxContent);
+                    var contentFocus = this._edit.hasFocus();
                     
                     if (!titleFocus && !contentFocus) {
                         if (!this._isPreven) {
@@ -257,20 +345,25 @@
                 
                 this._setcontentHeight = function () {
                 
-                
                     if ($('.content').height() > this._keyoutcontentHeight) {
                         $('.content').height(this._keyoutcontentHeight);
-                        this._edit.setSize('auto', this._keyoutcontentHeight + 'px');
+                        //this._edit.setSize('auto', this._keyoutcontentHeight + 'px');
+                        //this._edit.setSize('auto', 'auto');
+                        //this._scroll.refReshEdit();
                     }
                     else
                     {
                         $('.content').height(this._loadcontentHeight);
-                        this._edit.setOption("readOnly", "nocursor");
-                        this._edit.setSize('auto', this._loadcontentHeight + 'px');
-                        this._edit.setOption("readOnly", false);
+                        //this._edit.setOption("readOnly", "nocursor");
+                        //this._edit.setSize('auto', this._loadcontentHeight + 'px');
+                        //this._edit.setSize('auto', 'auto');
+                        
+                        //this._edit.setOption("readOnly", false);
                     }
                     
                     $('body').scrollTop(0);
+                    
+                    this._scroll.refReshEdit();
 
                 };
                 
@@ -288,7 +381,13 @@
                     var viewHeight = $('.warpper').height();
                     var content_height = viewHeight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
                     $('.content').height(content_height);
-                    CodeMirrorEditor.setSize('auto', content_height + 'px');
+                    
+                    if (this._drvtype  == 'ios') {
+                        this._edit.setSize('auto', 'auto');
+                    }
+                    else {
+                        this._edit.setSize('auto', content_height + 'px');
+                    }
 
                     var md_wrapper_height = $('.preview').height() - ($('.preview-foot').height() + 1);
                     $('#md-wrapper').height(md_wrapper_height);
@@ -562,22 +661,39 @@
 			};
 
 			window.onload = function () {
-				initEdit();
+				
+                initEdit();
                 
-
 			};
 
 			function initEdit () {
 
 				var mv2input = document.getElementById('mv2_input');
 				var maxec = 0;
+                
+                if ($('#postid').length == 0) {
+					hidePreview();
+				}
 
+                /*
 				CodeMirrorEditor = CodeMirror.fromTextArea(mv2input, {
 					lineWrapping: true
 				});
+                */
+                
+                var edit_inputStyle = 'textarea';
+                                
+                if (utilTools().checkDriver() == 'android') {
+                    edit_inputStyle = 'contenteditable';
+                }
+                edit_inputStyle = 'contenteditable';
+                
+                CodeMirrorEditor = CodeMirror($('.content')[0], {
+                    value: mv2input.value,
+                    inputStyle: edit_inputStyle,
+					lineWrapping: true
+				});
 
-				dc = new DocCache(CodeMirrorEditor);
-                sch = new screenHelper(CodeMirrorEditor);
 
 				var rendererMD = new marked.Renderer();
 
@@ -605,13 +721,20 @@
 			      	smartypants: false
 			    });
 
-				//CodeMirrorEditor.setOption('lineNumbers', true);
+				$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
                 
+                dc = new DocCache(CodeMirrorEditor);
+                srh = new scrollHelper(CodeMirrorEditor);
+                sch = new screenHelper(CodeMirrorEditor, srh);
+                
+
+				//CodeMirrorEditor.setOption('lineNumbers', true);
                 //CodeMirrorEditor.inputStyle
                 
 				CodeMirrorEditor.on('change', function () {
 					$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
-                    dc.cache(CodeMirrorEditor.getValue())
+                    dc.cache(CodeMirrorEditor.getValue());
+                    srh.refReshHtml();
 
 					var ec = CodeMirrorEditor.changeGeneration();
 
@@ -634,28 +757,6 @@
 					}
 
 				});
-
-				if ($('#postid').length == 0) {
-					hidePreview();
-				}
-
-				$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
-                
-                //要在确保内容渲染后执行,否则不会滚动
-                /*
-                var myScroll = new IScroll('#md-wrapper', {
-                    preventDefault: false,
-                    hScrollbar:false,  //禁止横向滚动
-                    vScroll:true,      //为true时允许y轴滚动
-                    bounce:false,      //当滚动器到达容器边界时他将执行一个小反弹动画。在老的或者性能低的设备上禁用反弹对实现平滑的滚动有帮助。
-                    click:true,    　   //如果你想你的应用程序响应click事件，那么该设置次属性为true
-                    hideScrollbar: false, //是否隐藏滚动条  
-                    mouseWheel: true
-                });
-                
-                console.log(myScroll)
-                */
-                
 
 				$('#head-goback').bind('click', function () {
 					history.go(-1);
@@ -921,10 +1022,9 @@
 		        }
 		    }
 
-			
-
 			function showPreview() {
 				$('.preview').show();
+                srh.refReshHtml();
 			}
 
 			function hidePreview() {
