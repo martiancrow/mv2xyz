@@ -7130,21 +7130,30 @@ function dispatchKeyInner(cm, name, e, handle) {
 
 // Handle a key from the keydown event.
 function handleKeyBinding(cm, e) {
-  var name = keyName(e, true);
-  if (!name) { return false }
+    //Cmark-BugIosIn
+    //Crow code if ios return false
+    var ua = navigator.userAgent;
+    if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+        return false;
+    }
+    //end if
 
-  if (e.shiftKey && !cm.state.keySeq) {
-    // First try to resolve full name (including 'Shift-'). Failing
-    // that, see if there is a cursor-motion command (starting with
-    // 'go') bound to the keyname without 'Shift-'.
-    return dispatchKey(cm, "Shift-" + name, e, function (b) { return doHandleBinding(cm, b, true); })
-        || dispatchKey(cm, name, e, function (b) {
-             if (typeof b == "string" ? /^go[A-Z]/.test(b) : b.motion)
-               { return doHandleBinding(cm, b) }
-           })
-  } else {
-    return dispatchKey(cm, name, e, function (b) { return doHandleBinding(cm, b); })
-  }
+
+    var name = keyName(e, true);
+    if (!name) { return false }
+
+    if (e.shiftKey && !cm.state.keySeq) {
+        // First try to resolve full name (including 'Shift-'). Failing
+        // that, see if there is a cursor-motion command (starting with
+        // 'go') bound to the keyname without 'Shift-'.
+        return dispatchKey(cm, "Shift-" + name, e, function (b) { return doHandleBinding(cm, b, true); })
+            || dispatchKey(cm, name, e, function (b) {
+                if (typeof b == "string" ? /^go[A-Z]/.test(b) : b.motion)
+                { return doHandleBinding(cm, b) }
+            })
+    } else {
+        return dispatchKey(cm, name, e, function (b) { return doHandleBinding(cm, b); })
+    }
 }
 
 // Handle a key from the keypress event
@@ -7956,6 +7965,7 @@ function registerEventHandlers(cm) {
 
     var inp = d.input.getField();
     on(inp, "keyup", function (e) { return onKeyUp.call(cm, e); });
+    //Cmark
     on(inp, "keydown", operation(cm, onKeyDown));
     on(inp, "keypress", operation(cm, onKeyPress));
     on(inp, "focus", function (e) { return onFocus(cm, e); });
@@ -8934,7 +8944,6 @@ ContentEditableInput.prototype.pollSelection = function () {
 };
 
 ContentEditableInput.prototype.pollContent = function () {
-    //CMark
     if (this.readDOMTimeout != null) {
         clearTimeout(this.readDOMTimeout);
         this.readDOMTimeout = null;
@@ -9045,11 +9054,21 @@ ContentEditableInput.prototype.setUneditable = function (node) {
 
 ContentEditableInput.prototype.onKeyPress = function (e) {
     //Cmark-BugIosIn  other browser onkeypress dont apply this code without ios, warning function applyTextInput()
-    //if (e.charCode == 0 || this.composing) { return }
-    //e.preventDefault();
-    //if (!this.cm.isReadOnly()) {
-    //    operation(this.cm, applyTextInput)(this.cm, String.fromCharCode(e.charCode == null ? e.keyCode : e.charCode), 0);
-    //}
+
+    //Crow code if ios return false
+    var ua = navigator.userAgent;
+    
+    if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/) && e.charCode != 13) {
+        return false;
+    }
+    //end if
+
+
+    if (e.charCode == 0 || this.composing) { return }
+    e.preventDefault();
+    if (!this.cm.isReadOnly()) {
+        operation(this.cm, applyTextInput)(this.cm, String.fromCharCode(e.charCode == null ? e.keyCode : e.charCode), 0);
+    }
 };
 
 ContentEditableInput.prototype.readOnlyChanged = function (val) {
