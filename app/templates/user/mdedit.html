@@ -40,8 +40,8 @@
 			.preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;}
             #md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;position:relative}
 			.markdown-body {width: 100%;overflow: hidden;padding: 18px 12px;box-sizing: border-box;float: left;}
-			.preview-foot {width: 100%;height: 35px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}
-			.preview-foot i {line-height: 35px;float: left;cursor: pointer;}
+			.preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}
+			.preview-foot i {line-height: 50px;float: left;cursor: pointer;}
 			.preview-foot .tools-left {margin-left: 10px;height: 100%;float: left;overflow: hidden;}
 			.preview-foot .tools-right {margin-right: 10px;height: 100%;float: right;overflow: hidden;}
             
@@ -55,16 +55,16 @@
 			.head .tools-right .disable:before{color:#c0c0c0;}
 			.head .tools-right .save{margin-left: 10px;}
 			
-			.foot {width: 100%;height: 35px;background-color: #fff;border-top: 1px solid #ddd;float: left;overflow: hidden;z-index: 999;}
-			.foot .toolsbar {width: 100%;height: 35px;position: relative;float: left;border-bottom: 1px solid #ddd;box-sizing: border-box;}
-			.foot .toolsbar i {line-height: 35px;cursor: pointer;}
+			.foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;float: left;overflow: hidden;z-index: 999;box-sizing: border-box;}
+			.foot .toolsbar {width: 100%;height: 50px;position: relative;float: left;border-bottom: 1px solid #ddd;box-sizing: border-box;}
+			.foot .toolsbar i {line-height: 50px;cursor: pointer;}
 
 			.foot .toolsbar .tools-left {margin-left: 10px;height: 100%;float: left;width: 85%;overflow: hidden;}
 			.foot .toolsbar .tools-left .tools-left-warpper {height: 100%;float: left;position: relative;touch-action:none;}
 			.foot .toolsbar .tools-left .option{margin-right: 25px;float: left;display: block;}
 			.foot .toolsbar .tools-right {margin-right: 10px;height: 100%;float: right;overflow: hidden;}
 
-			#upload-file {width: 100%;height: 264px;float: left;position: relative;}
+			#upload-file {width: 100%;height: 264px;float: left;position: relative;display:none;}
 			#upload-file .upload-type {margin: 80px auto;overflow: hidden;height: 64px;}
 			#upload-file .upload-type .img-btn {width: 60px;height: 64px;margin: auto 10px;float: left;text-align: center;position: relative;}
 			#upload-file .upload-type .img-btn i {margin: auto;cursor: pointer;}
@@ -84,12 +84,12 @@
 			
 			<div class="head">
 				<div class="tools-left">
-					<i id="head-goback" class="fa fa-long-arrow-left fa-lg"></i>
+					<i id="head-goback" class="fa fa-long-arrow-left fa-lg fa-fw"></i>
 				</div>
 				<div class="tools-right">
-					<i id="undo-btn" class="fa fa-undo fa-lg option disable"></i>
-					<i id="redo-btn" class="fa fa-repeat fa-lg option disable"></i>
-					<i id="save-btn" class="fa fa-save fa-lg save"></i>
+					<i id="undo-btn" class="fa fa-undo fa-lg fa-fw option disable"></i>
+					<i id="redo-btn" class="fa fa-repeat fa-lg fa-fw option disable"></i>
+					<i id="save-btn" class="fa fa-save fa-lg fa-fw save"></i>
 				</div>					
 			</div>
 			<div class="title">
@@ -104,19 +104,21 @@
 						<div id="foot-tools-left-wrapper"  class="tools-left-warpper">
 							<i id="insert-head" class="fa fa-header fa-lg option"></i>
 							<i id="insert-bold" class="fa fa-bold fa-lg option"></i>
+                            <i id="insert-strikethrough" class="fa fa-strikethrough fa-lg option"></i>
 							<i id="insert-media" class="fa fa-camera fa-lg option"></i>
 							<i id="insert-quote" class="fa fa-quote-left fa-lg option"></i>
 							<i id="insert-terminal" class="fa fa-terminal fa-lg option"></i>
+                            <i id="insert-code" class="fa fa-code fa-lg option"></i>
+                            <i id="insert-check" class="fa fa-check-circle-o fa-lg option"></i>
 							<i id="insert-add" class="fa fa-plus fa-lg option"></i>
 							<!--<i id="insert-upload" class="fa fa-upload fa-lg option"></i>-->
 							<i id="insert-minus" class="fa fa-minus fa-lg option"></i>
 							<i id="insert-percent" class="fa fa-percent fa-lg option"></i>
 							<i id="insert-exclamation" class="fa fa-exclamation fa-lg option"></i>
-							<i id="insert-code" class="fa fa-code fa-lg option"></i>
 							<i id="insert-indent" class="fa fa-indent fa-lg option"></i>
 							<i id="insert-link" class="fa fa-link fa-lg option"></i>
 							<i id="insert-list" class="fa fa-list-ol fa-lg option"></i>
-							<i id="insert-check" class="fa fa-check-circle-o fa-lg option"></i>
+							
 						</div>
 					</div>
 					<div class="tools-right">
@@ -171,14 +173,32 @@
                     var app = navigator.appVersion;
                     
                     if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                        if (ua.indexOf('iPhone') > -1) {
+                            
+                            if (ua.indexOf('MQQBrowser') > -1) {
+                            
+                                return 'ios_iphone_mqq';
+                            }
+                            else if (ua.indexOf('Safari') == -1) {
+                            
+                                return 'ios_iphone_webapp';
+                            }
+                        
+                            return 'ios_iphone_safari';
+                        }
+                        else if (ua.indexOf('iPad') > -1) {
+                        
+                            return 'ios_ipad_safari';
+                        }
+                    
                         return 'ios';
                     }
                     else if (ua.indexOf('Android') > -1 || ua.indexOf('Linux') > -1) {
+                        
                         return 'android'
                     }
-                    else {
-                        return  'other';
-                    }
+                    
+                    return  'other';
 
                 };
                 
@@ -196,30 +216,59 @@
                     this._edit = _edit;
                     this._drvtype = utilTools().checkDriver();
                     
-                    if (this._drvtype == "ios") {
+                    if (this._drvtype.indexOf('ios')  > -1) {
                         $("#md-wrapper").css("overflow-y", "hidden");
                         
                         this._htmlScroll = new IScroll('#md-wrapper', {
-                            preventDefault: false,
+                            preventDefault: true,
+                            preventDefaultException: {
+                                tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|A|PRE|CODE)$/
+                            },
+                            disableMouse: true,
+                            disablePointer: true,
+                            scrollbars: true,
                             hScrollbar: false,  
                             vScroll: true,      
                             bounce: true,      
-                            click: true,    　     //如果你想你的应用程序响应click事件，那么该设置次属性为true
+                            tap: "htmlscrolltap",
                             mouseWheel: false,
                             fadeScrollbars: true,
                             scrollbars: true
                         });
-                                                
+                   
                         this._editScroll = new IScroll('.content', {
                             preventDefault: false,
+                            disableMouse: true,
+                            disablePointer: true,
                             hScrollbar: false,  
                             vScroll: true,      
                             bounce: true,      
-                            click: true,    　     //如果你想你的应用程序响应click事件，那么该设置次属性为true
-                            mouseWheel: false,
+                            click: true,    　     //有bug,true的时候checkbox 不能点击,false的时候超链接不能点击
+                            mouseWheel: true,
                             fadeScrollbars: true,
                             scrollbars: true
                         });
+                        
+                        
+                        
+                        
+                        console.log(this._htmlScroll)
+                        
+                        $("pre").bind("htmlscrolltap", function (_e) {
+                            //alert(3)
+                        }.bind(this));
+                        
+                        $("code").bind("touchstart", function (_e) {
+                            //alert(1)
+                        }.bind(this));
+                        
+                        $("code").bind("touchmove", function (_e) {
+                            //alert(1)
+                        }.bind(this));
+                        
+                        $("code").bind("touchend", function (_e) {
+                            //alert(3)
+                        }.bind(this));
                         
                         
                     }
@@ -227,7 +276,7 @@
                 }
                 
                 this.refReshHtml = function () {
-                    if (this._drvtype == "ios") {
+                    if (this._drvtype.indexOf('ios')  > -1) {
                         setTimeout(function () {
                             this._htmlScroll.refresh();
                         }.bind(this), 0);
@@ -235,7 +284,7 @@
                 };
                 
                 this.refReshEdit = function () {
-                    if (this._drvtype == "ios") {
+                    if (this._drvtype.indexOf('ios')  > -1) {
                         setTimeout(function () {
                             this._editScroll.refresh();
                         }.bind(this), 0);
@@ -257,44 +306,55 @@
                     this._keyoutcontentHeight = 0;
                     this._keyHeight = 0;
                     
-                    this._firstOpenKey = true;
+                    this._additiveHeight = 0;
                     
+                    this._firstOpenKey = true;
                     this._orientationMsg = false;
                     
                     this._drvtype = utilTools().checkDriver();
                     this._onlLoadHeight();
-                    this._setSize();
+                    this.setSize();
                     this._prevenMove();
+                    this._checkAdditiveHeight();
                     
-
-                    if (this._drvtype  == 'ios') {
                     
+                    
+                    if (this._drvtype.indexOf('ios')  > -1) {
+                    
+                        //console.log("navigator.userAgent:" + navigator.userAgent)
+                        //console.log("navigator.appVersion:" + navigator.appVersion)
+                        
+                        //alert(navigator.userAgent)
+                        
+                        /*
                         setInterval(function () {
-                            //console.log("window.innerHeight:" + window.innerHeight)
-                            //console.log("document.documentElement.clientHeight:" + document.documentElement.clientHeight)
-                            //console.log("bodyScrollTop:" + $("body").scrollTop())
-                            //console.log("bodyHeight:" + $("body").height())
-                        }, 1000)
+                            console.log("window.innerHeight:" + window.innerHeight)
+                            console.log("document.documentElement.clientHeight:" + document.documentElement.clientHeight)
+                            console.log("bodyScrollTop:" + $("body").scrollTop())
+                            console.log("bodyHeight:" + $("body").height())
+                            
+                        }, 1000);
+                        */
                     
                         $(window).scroll(function(event) {
                             this._heightLoop();
+                            if (!this._firstOpenKey) {
+                                setTimeout(function () {
+                                    if ($('body').scrollTop() != 0) {
+                                        $('body').scrollTop(0)
+                                    }
+                                }.bind(this), 100);
+                            }
                             
-                            setTimeout(function () {
-                                if ($('body').scrollTop() != 0) {
-                                    //$('body').scrollTop(0)
-                                }
-                            }.bind(this), 200);
                         }.bind(this));
                         
                         $("#hide_input").bind('focus', function () {
                             this.onKeyChange("open");
                             $("#title").focus();
-                            
                         }.bind(this));
 
                         this._edit.on('focus', function () {
                             this.onKeyChange("open");
-                            
                         }.bind(this));
                         
                         this._edit.on('blur', function () {
@@ -302,6 +362,11 @@
                         }.bind(this));
                         
                         $("#title").bind('focus', function () {
+                            if ($("#title").attr("readonly")) {
+                                $("#title").blur();
+                                return false;
+                            }
+                        
                             if (this._firstOpenKey) {
                                 this._firstOpenKey = false;
                             }
@@ -322,27 +387,6 @@
                         }.bind(this));
 
                         this._onlLoadHeight();
-                        
-                        window.onorientationchange = function () {
-                            this._setSize();
-                            this._hideKey();
-                            
-                            if (window.orientation == 90 || window.orientation == -90) {
-                                this._edit.setOption("readOnly", "nocursor");
-                                
-                                if (!this._orientationMsg) {
-                                    alert("为了您获得最佳的用户体验,请在竖屏下进行编辑");
-                                    this._orientationMsg = true;
-                                }
-                                
-                            }
-                            else {
-                                this._edit.setOption("readOnly", false);
-                            }
-                            
-                            
-                        }.bind(this);
-
                         this._scroll.refReshHtml();
                         this._scroll.refReshEdit();
                         
@@ -351,9 +395,18 @@
                     }
                     else {
                         window.onresize = function () {
-                            this._setSize();
+                            this.setSize();
+
                         }.bind(this);
                     }
+                    
+                    window.onorientationchange = function () {
+                        this.setSize();
+                        this._hideKey();
+                        
+                        this.ListenOrientation();
+                                                
+                    }.bind(this);
                     
 
                 };
@@ -363,22 +416,32 @@
                     this._loadinnerHeight = window.innerHeight;
                 };
 
-                
+                this._checkAdditiveHeight = function () {
+                    if (this._drvtype == 'ios_iphone_safari') { 
+                        this._additiveHeight = 45;
+                    }
+                };
                 
                 this._prevenMove = function () {
                     
-                    if (this._drvtype  == 'ios') {
+                    if (this._drvtype.indexOf('ios')  > -1) {
                     
                         $('html').bind('touchmove', function (e) {
-                            //e.preventDefault();
+                            if ($('.preview').is(':hidden')) {
+                                e.preventDefault();
+                            }
                         }.bind(this));
                     
                         $('body').bind('touchmove', function (e) {
-                            //e.preventDefault();
+                            if ($('.preview').is(':hidden')) {
+                                e.preventDefault();
+                            }
                         }.bind(this));
                         
                         $('.warpper').bind('touchmove', function (e) {
-                            //e.preventDefault();
+                            if ($('.preview').is(':hidden')) {
+                                e.preventDefault();
+                            }
                         }.bind(this));
                         
                         $('.head').bind('touchmove', function (e) {
@@ -393,34 +456,41 @@
                             e.preventDefault();
                         }.bind(this));
                         
-                        $('#foot').bind('touchmove', function (e) {
-                            //e.preventDefault();
+                        $('.foot').bind('touchmove', function (e) {
+                            e.preventDefault();
                         }.bind(this));
                         
                         $('#md-wrapper').bind('touchmove', function (e) {
-                            e.preventDefault();
+                            //e.preventDefault();
                         }.bind(this));
                     
                     }
                 };
                 
                 this._openKey = function () {
-                    
-                
+
                     if ($('.content').height() > this._keyoutcontentHeight) {
-                        if (this._loadcontentHeight && this._keyoutcontentHeight) {
-                            //this._setcontentHeight();
-                        }
-                        else {
-                            //document.getElementById("foot").scrollIntoView();
-                            //$("#foot")[0].scrollIntoView();
+                    
+                        if (this._firstOpenKey) {
                             
                             $("body").scrollTop(this._loadinnerHeight);
                             setTimeout(function () {
                                 
-                                //$("#foot")[0].scrollIntoView();
-                                //this._setcontentHeight()
-                            }.bind(this), 1000);
+                                if (this._drvtype.indexOf('iphone') > -1) {
+                                    
+                                }
+                                
+                                $("#foot")[0].scrollIntoView();
+
+                                setTimeout(function () {
+                                    this._setcontentHeight();
+                                }.bind(this), 100);
+                                
+                            }.bind(this), 700);
+                        }
+                        else {
+
+                            this._setcontentHeight();
                         }
                     }
                 };
@@ -465,14 +535,20 @@
                 };
                 
                 this._heightLoop = function () {
+                
+                    //prevent scrollIntoView scroll too more
+                    var temkoch = this._loadcontentHeight - $('body').scrollTop() + this._additiveHeight;
 
-                    if ($('body').scrollTop() > this._keyHeight && window.innerHeight != this._loadinnerHeight) {
+                    if (temkoch > 0 && $('body').scrollTop() > this._keyHeight && window.innerHeight != this._loadinnerHeight) {
                         this._keyHeight = $('body').scrollTop();                    
-                        this._keyoutcontentHeight = this._loadcontentHeight - this._keyHeight;
+                        this._keyoutcontentHeight = this._loadcontentHeight - this._keyHeight + this._additiveHeight;
+                        
                     }
+                    
+                    
                 };
                 
-                this._setSize = function () {
+                this.setSize = function () {
 
                     var initfootheight = $('#foot').height() + 1; //broadheight
                     
@@ -480,7 +556,7 @@
                     var content_height = viewHeight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
                     $('.content').height(content_height);
                     
-                    if (this._drvtype  == 'ios') {
+                    if (this._drvtype.indexOf('ios')  > -1) {
                         this._edit.setSize('auto', 'auto');
                     }
                     else {
@@ -497,6 +573,33 @@
                     }
 
                     $('.tools-left-warpper').width(foot_tools_wrapper_width);
+                };
+                
+                this.ListenOrientation = function () {
+                    
+                    if (this._drvtype.indexOf('ios') > -1 || true) {
+                    
+                        if (window.orientation == 90 || window.orientation == -90) {
+                        
+                            this._edit.setOption("readOnly", "nocursor");
+                            $('#title').attr("readonly", "readonly");
+                        
+                            if ($('.preview').is(':hidden')) {
+                                if (!this._orientationMsg) {
+                                    alert("为了您获得最佳的用户体验,请在竖屏下进行编辑");
+                                    this._orientationMsg = true;
+                                }
+                            }
+                            
+                            $('.preview').show();
+                        }
+                        else {
+                        
+                            this._edit.setOption("readOnly", false);
+                            $('#title').removeAttr("readonly");
+                            
+                        }
+                    }
                 };
                 
                 this.preventChange = function () {
@@ -519,7 +622,11 @@
                 };
                 
                 this.autoOpenIosKey = function () {
-                    $("#hide_input").focus();
+                
+                    if (window.orientation != 90 && window.orientation != -90) {
+                    
+                        $("#hide_input").focus();
+                    }
                 }
                 
                 this._init_();
@@ -769,12 +876,14 @@
 
                     hidePreview();
                 
-                    if (utilTools().checkDriver() == "ios") {
+                    if (utilTools().checkDriver().indexOf("ios") > -1) {
                     
                         $(".new-file-msg").show();
                     
                         $(".new-file-msg").bind("click", function () {
+                            
                             document.activeElement.blur();
+                            sch.ListenOrientation();
                             sch.autoOpenIosKey();
                             $(".new-file-msg").hide();
                         });
@@ -885,6 +994,8 @@
 					document.activeElement.blur();
                     sch.autoOpenIosKey();
 					hidePreview();
+                    sch.ListenOrientation();
+
 				});
 
 				$('#undo-btn').bind('click', function () {
@@ -908,45 +1019,77 @@
 
 				$('#insert-head').bind('click', function () {
                     sch.preventChange();
+                    var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					var token = CodeMirrorEditor.getRange({line: cursor.line, ch: cursor.ch - 2}, {line: cursor.line, ch: cursor.ch});
 
 					if (token == '# ') {
 
-						CodeMirrorEditor.replaceRange('# ', {line: cursor.line, ch: cursor.ch - 1}, {line: cursor.line, ch: cursor.ch});
+						CodeMirrorEditor.replaceRange('# ' + selctx, {line: cursor.line, ch: cursor.ch - 1}, {line: cursor.line, ch: cursor.ch});
 						CodeMirrorEditor.focus();					
 						CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
 					
 					}
 					else {
 						
-						CodeMirrorEditor.replaceSelection('# ');
+						CodeMirrorEditor.replaceSelection('# ' + selctx);
 						CodeMirrorEditor.focus();					
 						CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
 					}
-
-					
 
 				});
 
 				$('#insert-bold').bind('click', function () {
                     sch.preventChange();
+                    var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('****')
-					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+					CodeMirrorEditor.replaceSelection('**' + selctx + '**')
+					CodeMirrorEditor.focus();
+                    
+                    if (selctx) {
+                        CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 4);
+                    }
+                    else {
+                        CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+                    }
+					
+				});
+                
+                $('#insert-strikethrough').bind('click', function () {
+                    sch.preventChange();
+                    var selctx = CodeMirrorEditor.getSelection();
+					var cursor = CodeMirrorEditor.getCursor();
+					CodeMirrorEditor.replaceSelection('~~' + selctx + '~~')
+					CodeMirrorEditor.focus();
+                    
+                    if (selctx) {
+                        CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 4);
+                    }
+                    else {
+                        CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+                    }
+					
 				});
 
 				$('#insert-media').bind('click', function () {
 
 					hideKeyboard();
 
-					var footheight = $('#upload-file').height() + 35 + 1;
-                    $('.foot').height(footheight)
+					var footheight = $('#upload-file').height() + 49 + 1;//broad height
 
-					if ($('.foot').height() > 35) {
-						footheight = 35;
+					if ($('.foot').height() > 49) {
+                        $('#upload-file').hide();
+						footheight = 49;
 					}
+                    else {
+                        $('#upload-file').show();
+                    }
+                    
+                    $('.foot').height(footheight);
+                    
+                    sch.setSize();
+                    
+                    
 
 					//$('.foot').animate({height: footheight}, 300);
 
@@ -954,18 +1097,20 @@
 
 				$('#insert-quote').bind('click', function () {
                     sch.preventChange();
+                    var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('```\n\n```')
+					CodeMirrorEditor.replaceSelection('> ' + selctx);
 					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line + 1, 0);
+					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
 				});
 
 				$('#insert-terminal').bind('click', function () {
                     sch.preventChange();
+                    var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('> ')
+					CodeMirrorEditor.replaceSelection('　' + selctx)
 					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line + 2, 0);
+					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
 				});
 
 				$('#insert-add').bind('click', function () {
@@ -1004,12 +1149,14 @@
 				});
 
 				$('#insert-code').bind('click', function () {
-                    //expire
                     sch.preventChange();
+                    var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection(':% %:')
-					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 3);
+					CodeMirrorEditor.replaceSelection('```\n' + selctx + '\n```')
+					CodeMirrorEditor.focus();	
+                    
+                    CodeMirrorEditor.setCursor(cursor.line + 1, 0);
+                    
 				});
 
 				$('#insert-indent').bind('click', function () {

@@ -138,8 +138,6 @@ def edit_post(postid):
 
     if request.method == 'POST':
 
-        print(request.form['body_md'])
-
         post.post_name = request.form['name']
         post.post_body_md = request.form['body_md']
         post.post_updatetime = datetime.utcnow()
