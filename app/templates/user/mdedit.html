@@ -39,7 +39,7 @@
 
 			.preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;}
             #md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;position:relative}
-			.markdown-body {width: 100%;overflow: hidden;padding: 18px 12px;box-sizing: border-box;float: left;}
+			.markdown-body {width: 100%;overflow: hidden;padding: 18px 21px;box-sizing: border-box;float: left;}
 			.preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}
 			.preview-foot i {line-height: 50px;float: left;cursor: pointer;}
 			.preview-foot .tools-left {margin-left: 10px;height: 100%;float: left;overflow: hidden;}
@@ -107,18 +107,16 @@
                             <i id="insert-strikethrough" class="fa fa-strikethrough fa-lg option"></i>
 							<i id="insert-media" class="fa fa-camera fa-lg option"></i>
 							<i id="insert-quote" class="fa fa-quote-left fa-lg option"></i>
-							<i id="insert-terminal" class="fa fa-terminal fa-lg option"></i>
-                            <i id="insert-code" class="fa fa-code fa-lg option"></i>
-                            <i id="insert-check" class="fa fa-check-circle-o fa-lg option"></i>
-							<i id="insert-add" class="fa fa-plus fa-lg option"></i>
-							<!--<i id="insert-upload" class="fa fa-upload fa-lg option"></i>-->
-							<i id="insert-minus" class="fa fa-minus fa-lg option"></i>
-							<i id="insert-percent" class="fa fa-percent fa-lg option"></i>
-							<i id="insert-exclamation" class="fa fa-exclamation fa-lg option"></i>
 							<i id="insert-indent" class="fa fa-indent fa-lg option"></i>
-							<i id="insert-link" class="fa fa-link fa-lg option"></i>
-							<i id="insert-list" class="fa fa-list-ol fa-lg option"></i>
-							
+                            <i id="insert-code" class="fa fa-code fa-lg option"></i>
+                            <i id="insert-horizontal-rule" class="fa fa-minus fa-lg option"></i>
+							<i id="insert-list-ul" class="fa fa-list-ul fa-lg option"></i>
+                            <!--<i id="insert-list-ol" class="fa fa-list-ol fa-lg option"></i>-->
+                            <i id="insert-check-square-o" class="fa fa-check-square-o fa-lg option"></i>
+                            <i id="insert-square-o" class="fa fa-square-o fa-lg option"></i>
+                            <i id="insert-link" class="fa fa-link fa-lg option"></i>
+							<!--<i id="insert-upload" class="fa fa-upload fa-lg option"></i>-->
+
 						</div>
 					</div>
 					<div class="tools-right">
@@ -248,29 +246,7 @@
                             fadeScrollbars: true,
                             scrollbars: true
                         });
-                        
-                        
-                        
-                        
-                        console.log(this._htmlScroll)
-                        
-                        $("pre").bind("htmlscrolltap", function (_e) {
-                            //alert(3)
-                        }.bind(this));
-                        
-                        $("code").bind("touchstart", function (_e) {
-                            //alert(1)
-                        }.bind(this));
-                        
-                        $("code").bind("touchmove", function (_e) {
-                            //alert(1)
-                        }.bind(this));
-                        
-                        $("code").bind("touchend", function (_e) {
-                            //alert(3)
-                        }.bind(this));
-                        
-                        
+
                     }
 
                 }
@@ -773,83 +749,100 @@
                     this.db.onload = function () {
 
                         var postid = $("#postid").val();
+                        var datakey = "cache_new";
 
                         if (postid) {
-                            var datakey = "cache_" + postid;
-
-                            var res = this.db.get(datakey, function (_val) {
-                                if (_val) {
-
-                                    var updatetime = Date.parse(new Date($("#updatetime").val()));
-                                    var content = $("#mv2_input").val();
-
-                                    var localupdatetime = _val.updatetime;
-
-                                    if (localupdatetime > updatetime) {
-                                        if (confirm("监测到您上次未保存就退出,是否继续上次内容编辑")) {
-                                            content = _val.content;
-                                            updatetime = localupdatetime;
-                                            
-                                            this._edit.setValue(content);
-                                        }
-                                    }
-
-                                    var data = {
-                                        updatetime: updatetime,
-                                        content: content
-                                    };
-
-                                    this.db.set(datakey, data);
-                                }
-                                else {
-
-                                    var content = $("#mv2_input").val();
-                                    var updatetime = Date.parse(new Date($("#updatetime").val()));
-
-                                    var data = {
-                                        updatetime: updatetime,
-                                        content: content
-                                    };
-
-                                    this.db.set(datakey, data);
-                                }
-                            }.bind(this));
+                        
+                            datakey = "cache_" + postid;
                         }
+                                                
+                        var res = this.db.get(datakey, function (_val) {
+                        
+                            if (_val) {
+                            
+                                var content = $("#mv2_input").val();
+                                var updatetime = 0;
+                                
+                                if ($("#updatetime").length > 0) {
+                                
+                                    updatetime = Date.parse(new Date($("#updatetime").val()));
+                                }
+
+                                var localupdatetime = _val.updatetime;
+
+                                if (localupdatetime > updatetime) {
+                                    if (confirm("监测到您上次未保存就退出,是否继续上次内容编辑")) {
+                                        content = _val.content;
+                                        updatetime = localupdatetime;
+                                        
+                                        this._edit.setValue(content);
+                                    }
+                                }
+
+                                var data = {
+                                    updatetime: updatetime,
+                                    content: content
+                                };
+
+                                this.db.set(datakey, data);
+                            }
+                            else {
+
+                                var content = $("#mv2_input").val();
+                                var updatetime = 0;
+                                
+                                if ($("#updatetime").length > 0) {
+                                
+                                    updatetime = Date.parse(new Date($("#updatetime").val()));
+                                }
+
+                                var data = {
+                                    updatetime: updatetime,
+                                    content: content
+                                };
+                                
+                                
+
+                                this.db.set(datakey, data);
+                            }
+                        }.bind(this));
+                        
                     }.bind(this);
                     
                 };
                 
                 this.cache = function (_mdcode) {
                     var postid = $("#postid").val();
+                    var datakey = "cache_new";
                         
                     if (postid) {
-                        var datakey = "cache_" + postid;
-                        
-                        var content = _mdcode;
-                        var updatetime = Date.parse(new Date());
-                        
-                        var data = {
-                            updatetime : updatetime,
-                            content : content
-                        };
-                                
-                        this.db.set(datakey, data);
-                        
-                        
+                    
+                        datakey = "cache_" + postid;
                     }
+                    
+                    var content = _mdcode;
+                    var updatetime = Date.parse(new Date());
+                    
+                    var data = {
+                        updatetime : updatetime,
+                        content : content
+                    };
+                            
+                    this.db.set(datakey, data);
                     
                 };
                 
-                this.save = function () {
+                this.clean = function () {
+                
                     var postid = $("#postid").val();
+                    var datakey = "cache_new";
                         
                     if (postid) {
-                        var datakey = "cache_" + postid;
- 
-                        this.db.del(datakey);
-                        
-                        
+                    
+                        datakey = "cache_" + postid; 
                     }
+                    
+                    this.db.del(datakey);
                     
                 };
                 
@@ -920,6 +913,7 @@
 				var rendererMD = new marked.Renderer();
 
 				rendererMD.listitem = function(text) {
+                    
 	            	if (/^\s*\[[x\s]\]\s*/.test(text)) {
 		               text = text.replace(/^\s*\[\s\]\s*/, '<input type=\"checkbox\" /> ')
 		                          .replace(/^\s*\[x\]\s*/,  '<input type=\"checkbox\" checked disabled /> ');
@@ -931,6 +925,20 @@
 		                return "<li>" + text + "</li>";
 		            }
 		        };
+                
+                
+                rendererMD.heading = function (text, level) {
+                    //var escapedText = text.toLowerCase().replace(/[^\w]+/g, '-');
+                    var escapedText = text.toLowerCase();
+                    return "<h" + level + ">" + 
+                               "<a id=\"" + escapedText + "\" class=\"anchor\" aria-hidden=\"true\" href=\"#" + escapedText + "\">" +
+                                   "<svg class=\"octicon octicon-link\" viewBox=\"0 0 16 16\" version=\"1.1\" width=\"16\" height=\"16\" aria-hidden=\"true\">" + 
+                                       "<path fill-rule=\"evenodd\" d=\"M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z\"></path>" +
+                                   "</svg>" + 
+                               "</a>" +
+                               text + 
+                           "</h" + level + ">";
+                };
 
 				marked.setOptions({
 					renderer: rendererMD,
@@ -977,6 +985,8 @@
 					else {
 						$('#redo-btn').removeClass('disable');
 					}
+                    
+                    srh.refReshEdit();
 
 				});
 
@@ -1012,6 +1022,7 @@
 
 				$('#del-post').bind('click', function () {
 					if(confirm('确定要删除本笔记么,删除后将不可恢复!') == true) {
+                        
 						deletepost();
 					}
 				});
@@ -1104,7 +1115,7 @@
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
 				});
 
-				$('#insert-terminal').bind('click', function () {
+				$('#insert-indent').bind('click', function () {
                     sch.preventChange();
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
@@ -1112,43 +1123,8 @@
 					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
 				});
-
-				$('#insert-add').bind('click', function () {
-                    sch.preventChange();
-					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('+')
-					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
-				});
-
-				$('#insert-minus').bind('click', function () {
-                    //expire
-                    sch.preventChange();
-					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('-')
-					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
-				});
-
-				$('#insert-percent').bind('click', function () {
-                    //expire
-                    sch.preventChange();
-					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('%')
-					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
-				});
-
-				$('#insert-exclamation').bind('click', function () {
-                    //expire
-                    sch.preventChange();
-					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('!')
-					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
-				});
-
-				$('#insert-code').bind('click', function () {
+                
+                $('#insert-code').bind('click', function () {
                     sch.preventChange();
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
@@ -1158,32 +1134,47 @@
                     CodeMirrorEditor.setCursor(cursor.line + 1, 0);
                     
 				});
-
-				$('#insert-indent').bind('click', function () {
-                    //expire
+                
+                $('#insert-horizontal-rule').bind('click', function () {
                     sch.preventChange();
+                    var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('\t')
+					CodeMirrorEditor.replaceSelection(selctx + '\n---\n')
 					CodeMirrorEditor.focus();					
-					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
+					CodeMirrorEditor.setCursor(cursor.line + 2, cursor.ch);
 				});
 
-				$('#insert-link').bind('click', function () {
+				$('#insert-list-ul').bind('click', function () {
                     sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('![](http://)')
+					CodeMirrorEditor.replaceSelection('- ')
 					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
 				});
 
-				$('#insert-check').bind('click', function () {
+                $('#insert-check-square-o').bind('click', function () {
                     sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('- [x] ')
 					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 6);
 				});
-
+                
+                $('#insert-square-o').bind('click', function () {
+                    sch.preventChange();
+					var cursor = CodeMirrorEditor.getCursor();
+					CodeMirrorEditor.replaceSelection('- [ ] ')
+					CodeMirrorEditor.focus();					
+					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 6);
+				});
+                
+                $('#insert-link').bind('click', function () {
+                    sch.preventChange();
+					var cursor = CodeMirrorEditor.getCursor();
+					CodeMirrorEditor.replaceSelection('![](http://)')
+					CodeMirrorEditor.focus();					
+					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+				});
 
 				$('#foot-tools-left-wrapper').bind('mousedown', function (e) {
 					premouse = mouseCoords(event);
@@ -1373,7 +1364,7 @@
 
   							if (result) {
   								if (result.code == 200) {
-                                    dc.save();
+                                    dc.clean();
   									window.location.href = result.nexturl;
   								}
   							}
@@ -1395,6 +1386,7 @@
 					var geturl = '/user/del/';
 
 					if (postid.length == 0) {
+                        dc.clean();
 						alert('您还没有保存!');
 						return;
 					}
@@ -1411,6 +1403,7 @@
 
   							if (result) {
   								if (result.code == 200) {
+                                    dc.clean();
   									window.location.href = result.nexturl;
   								}
   								else {
