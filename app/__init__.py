@@ -21,7 +21,10 @@ def change_cdn_domestic(tar_app):
     local = tar_app.extensions['bootstrap']['cdns']['local']
 
     def change_one(tar_lib, tar_ver, fallback):
-        tar_js = ConditionalCDN('BOOTSTRAP_SERVE_LOCAL', fallback, WebCDN('//cdn.bootcss.com/' + tar_lib + '/' + tar_ver + '/'))
+        if 'bootstrap' in tar_lib:
+            tar_lib = 'twitter-bootstrap'
+    
+        tar_js = ConditionalCDN('BOOTSTRAP_SERVE_LOCAL', fallback, WebCDN('//cdn.staticfile.org/' + tar_lib + '/' + tar_ver + '/'))
         tar_app.extensions['bootstrap']['cdns'][tar_lib] = tar_js
 
     libs = {'jquery': {'ver': JQUERY_VERSION, 'fallback': local},
@@ -60,5 +63,6 @@ def create_app(config_name):
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    
     
     return app

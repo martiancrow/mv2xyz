@@ -1160,10 +1160,11 @@ function off(emitter, type, f) {
 }
 
 function signal(emitter, type /*, values...*/) {
-  var handlers = getHandlers(emitter, type);
-  if (!handlers.length) { return }
-  var args = Array.prototype.slice.call(arguments, 2);
-  for (var i = 0; i < handlers.length; ++i) { handlers[i].apply(null, args); }
+    //Cmark : all cm event signal in this func
+    var handlers = getHandlers(emitter, type);
+    if (!handlers.length) { return }
+    var args = Array.prototype.slice.call(arguments, 2);
+    for (var i = 0; i < handlers.length; ++i) { handlers[i].apply(null, args); }
 }
 
 // The DOM events that CodeMirror handles can be overridden by
@@ -3363,17 +3364,17 @@ function maybeUpdateLineNumberWidth(cm) {
 // If an editor sits on the top or bottom of the window, partially
 // scrolled out of view, this ensures that the cursor is visible.
 function maybeScrollWindow(cm, rect) {
-  if (signalDOMEvent(cm, "scrollCursorIntoView")) { return }
-
-  var display = cm.display, box = display.sizer.getBoundingClientRect(), doScroll = null;
-  if (rect.top + box.top < 0) { doScroll = true; }
-  else if (rect.bottom + box.top > (window.innerHeight || document.documentElement.clientHeight)) { doScroll = false; }
-  if (doScroll != null && !phantom) {
-    var scrollNode = elt("div", "\u200b", null, ("position: absolute;\n                         top: " + (rect.top - display.viewOffset - paddingTop(cm.display)) + "px;\n                         height: " + (rect.bottom - rect.top + scrollGap(cm) + display.barHeight) + "px;\n                         left: " + (rect.left) + "px; width: " + (Math.max(2, rect.right - rect.left)) + "px;"));
-    cm.display.lineSpace.appendChild(scrollNode);
-    scrollNode.scrollIntoView(doScroll);
-    cm.display.lineSpace.removeChild(scrollNode);
-  }
+    if (signalDOMEvent(cm, "scrollCursorIntoView")) { return }
+    
+    var display = cm.display, box = display.sizer.getBoundingClientRect(), doScroll = null;
+    if (rect.top + box.top < 0) { doScroll = true; }
+    else if (rect.bottom + box.top > (window.innerHeight || document.documentElement.clientHeight)) { doScroll = false; }
+    if (doScroll != null && !phantom) {
+        var scrollNode = elt("div", "\u200b", null, ("position: absolute;\n                         top: " + (rect.top - display.viewOffset - paddingTop(cm.display)) + "px;\n                         height: " + (rect.bottom - rect.top + scrollGap(cm) + display.barHeight) + "px;\n                         left: " + (rect.left) + "px; width: " + (Math.max(2, rect.right - rect.left)) + "px;"));
+        cm.display.lineSpace.appendChild(scrollNode);
+        scrollNode.scrollIntoView(doScroll);
+        cm.display.lineSpace.removeChild(scrollNode);
+    }
 }
 
 // Scroll a given position into view (immediately), verifying that
@@ -3462,9 +3463,9 @@ function addToScrollTop(cm, top) {
 // Make sure that at the end of the operation the current cursor is
 // shown.
 function ensureCursorVisible(cm) {
-  resolveScrollToPos(cm);
-  var cur = cm.getCursor();
-  cm.curOp.scrollToPos = {from: cur, to: cur, margin: cm.options.cursorScrollMargin};
+    resolveScrollToPos(cm);
+    var cur = cm.getCursor();
+    cm.curOp.scrollToPos = { from: cur, to: cur, margin: cm.options.cursorScrollMargin };
 }
 
 function scrollToCoords(cm, x, y) {
@@ -3744,27 +3745,27 @@ function startOperation(cm) {
 
 // Finish an operation, updating the display and signalling delayed events
 function endOperation(cm) {
-  var op = cm.curOp;
-  finishOperation(op, function (group) {
-    for (var i = 0; i < group.ops.length; i++)
-      { group.ops[i].cm.curOp = null; }
-    endOperations(group);
-  });
+    var op = cm.curOp;
+    finishOperation(op, function (group) {
+        for (var i = 0; i < group.ops.length; i++)
+        { group.ops[i].cm.curOp = null; }
+        endOperations(group);
+    });
 }
 
 // The DOM updates done when an operation finishes are batched so
 // that the minimum number of relayouts are required.
 function endOperations(group) {
-  var ops = group.ops;
-  for (var i = 0; i < ops.length; i++) // Read DOM
+    var ops = group.ops;
+    for (var i = 0; i < ops.length; i++) // Read DOM
     { endOperation_R1(ops[i]); }
-  for (var i$1 = 0; i$1 < ops.length; i$1++) // Write DOM (maybe)
+    for (var i$1 = 0; i$1 < ops.length; i$1++) // Write DOM (maybe)
     { endOperation_W1(ops[i$1]); }
-  for (var i$2 = 0; i$2 < ops.length; i$2++) // Read DOM
+    for (var i$2 = 0; i$2 < ops.length; i$2++) // Read DOM
     { endOperation_R2(ops[i$2]); }
-  for (var i$3 = 0; i$3 < ops.length; i$3++) // Write DOM (maybe)
+    for (var i$3 = 0; i$3 < ops.length; i$3++) // Write DOM (maybe)
     { endOperation_W2(ops[i$3]); }
-  for (var i$4 = 0; i$4 < ops.length; i$4++) // Read DOM
+    for (var i$4 = 0; i$4 < ops.length; i$4++) // Read DOM
     { endOperation_finish(ops[i$4]); }
 }
 
@@ -7965,7 +7966,7 @@ function registerEventHandlers(cm) {
 
     var inp = d.input.getField();
     on(inp, "keyup", function (e) { return onKeyUp.call(cm, e); });
-    //Cmark
+    //Cmark-BugIosIn
     on(inp, "keydown", operation(cm, onKeyDown));
     on(inp, "keypress", operation(cm, onKeyPress));
     on(inp, "focus", function (e) { return onFocus(cm, e); });
@@ -8525,23 +8526,23 @@ var addEditorMethods = function(CodeMirror) {
               clientHeight: displayHeight(this), clientWidth: displayWidth(this)}
     },
 
-    scrollIntoView: methodOp(function(range$$1, margin) {
-      if (range$$1 == null) {
-        range$$1 = {from: this.doc.sel.primary().head, to: null};
-        if (margin == null) { margin = this.options.cursorScrollMargin; }
-      } else if (typeof range$$1 == "number") {
-        range$$1 = {from: Pos(range$$1, 0), to: null};
-      } else if (range$$1.from == null) {
-        range$$1 = {from: range$$1, to: null};
-      }
-      if (!range$$1.to) { range$$1.to = range$$1.from; }
-      range$$1.margin = margin || 0;
+    scrollIntoView: methodOp(function (range$$1, margin) {
+        if (range$$1 == null) {
+            range$$1 = { from: this.doc.sel.primary().head, to: null };
+            if (margin == null) { margin = this.options.cursorScrollMargin; }
+        } else if (typeof range$$1 == "number") {
+            range$$1 = { from: Pos(range$$1, 0), to: null };
+        } else if (range$$1.from == null) {
+            range$$1 = { from: range$$1, to: null };
+        }
+        if (!range$$1.to) { range$$1.to = range$$1.from; }
+        range$$1.margin = margin || 0;
 
-      if (range$$1.from.line != null) {
-        scrollToRange(this, range$$1);
-      } else {
-        scrollToCoordsRange(this, range$$1.from, range$$1.to, range$$1.margin);
-      }
+        if (range$$1.from.line != null) {
+            scrollToRange(this, range$$1);
+        } else {
+            scrollToCoordsRange(this, range$$1.from, range$$1.to, range$$1.margin);
+        }
     }),
 
     setSize: methodOp(function(width, height) {
@@ -9053,7 +9054,7 @@ ContentEditableInput.prototype.setUneditable = function (node) {
 };
 
 ContentEditableInput.prototype.onKeyPress = function (e) {
-    //Cmark-BugIosIn  other browser onkeypress dont apply this code without ios, warning function applyTextInput()
+    //Cmark-BugIosIn other browser onkeypress dont apply this code without ios, warning function applyTextInput()
 
     //Crow code if ios return false
     var ua = navigator.userAgent;

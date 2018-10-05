@@ -87,7 +87,6 @@ def add_post():
             post_body_md=request.form['body_md'], 
             author_id=current_user.user.ua_user_id)
 
-
         db.session.add(post)
         db.session.commit()
 
@@ -143,7 +142,7 @@ def edit_post(postid):
         post.post_updatetime = datetime.utcnow()
 
 
-
+        #data_query = db.session.execute("set names 'utf8mb4';")        
         db.session.add(post)
         db.session.commit()
         

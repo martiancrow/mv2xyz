@@ -23,18 +23,18 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-        'mysql+mysqlconnector://admin:lxlloveme7@192.168.1.105/mv2xyz.dev'
+        'mysql+mysqlconnector://admin:lxlloveme7@192.168.1.105/mv2xyz.dev?charset=utf8mb4&collation=utf8mb4_general_ci'
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-        'mysql+mysqlconnector://admin:lxlloveme7@192.168.1.105/mv2xyz.test'
+        'mysql+mysqlconnector://admin:lxlloveme7@192.168.1.105/mv2xyz.test?charset=utf8mb4&collation=utf8mb4_general_ci'
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql+mysqlconnector://admin:lxlloveme7@192.168.1.105/mv2xyz'
+        'mysql+mysqlconnector://admin:lxlloveme7@192.168.1.105/mv2xyz?charset=utf8mb4&collation=utf8mb4_general_ci'
 
 
 config = {
