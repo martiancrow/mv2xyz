@@ -333,6 +333,14 @@
                                 this.onKeyChange("open");
                                 $("#title").focus();
                             }
+                        }.bind(this))
+                        
+                        $("#hide_input").bind('blur', function () {
+
+                            if (!this._firstOpenKey) {
+                            
+                                this.onKeyChange("close");
+                            }
                         }.bind(this));
 
                         this._edit.on('focus', function () {
@@ -558,20 +566,40 @@
                 };
                 
                 this.autoScroll = function (_type) {
-                
                     
                     if (this._drvtype.indexOf('ios') > -1) {
+                    
 
                         var cursor = this._edit.getCursor();
                         
                         var focusHeight = 0;
 
-                        for (var i = 0; i < cursor.line; i++) {
+                        for (var i = 0; i <= cursor.line; i++) {
                             focusHeight += this._edit.display.view[i].line.height;
                         }
-                        
+                                                
                         var scrollHeight = Math.abs(this._scroll._editScroll.y);
                         var viewportHeight = $(".content").height();
+                        
+                        var unvpsc = function () {
+                        
+                            var autoScrollheight = focusHeight - viewportHeight + this._edit.display.cachedTextHeight;
+                            autoScrollheight = autoScrollheight * -1;
+                            autoScrollheight = autoScrollheight < this._scroll._editScroll.maxScrollY ? this._scroll._editScroll.maxScrollY : autoScrollheight;
+                            this._scroll._editScroll.scrollTo(0, autoScrollheight, 0);
+                            this._edit.replaceSelection(' ');
+                            this._edit.replaceRange('', {line: cursor.line, ch: cursor.ch}, {line: cursor.line, ch: cursor.ch + 1});
+                        }.bind(this);
+                        
+                        var upvpsc = function () {
+                        
+                            var autoScrollheight = focusHeight - this._edit.display.cachedTextHeight;
+                            autoScrollheight = autoScrollheight * -1;
+                            autoScrollheight = autoScrollheight > 0 ? 0 : autoScrollheight;
+                            this._scroll._editScroll.scrollTo(0, autoScrollheight, 0);
+                            this._edit.replaceSelection(' ');
+                            this._edit.replaceRange('', {line: cursor.line, ch: cursor.ch}, {line: cursor.line, ch: cursor.ch + 1});
+                        }.bind(this);
                         
                         //console.log("cursor.line:" + cursor.line)
                         //console.log("focusHeight:" + focusHeight)
@@ -598,19 +626,16 @@
                                 $("#hide_input").val('');
                                 $("#hide_input").focus();
                             }
-                            else {
-                                if (_type == "hide_input_oninput") {
-                                    if (!this._autoScrollHideInputCanChange) {
-                                        return
-                                    }
-                                }
+                            if (_type == "hide_input_oninput") {
                             
-                                var autoScrollheight = focusHeight - viewportHeight + this._edit.display.cachedTextHeight;
-                                autoScrollheight = autoScrollheight * -1;
-                                autoScrollheight = autoScrollheight < this._scroll._editScroll.maxScrollY ? this._scroll._editScroll.maxScrollY : autoScrollheight;
-                                this._scroll._editScroll.scrollTo(0, autoScrollheight, 0);
-                                this._edit.replaceSelection(' ');
-                                this._edit.replaceRange('', {line: cursor.line, ch: cursor.ch}, {line: cursor.line, ch: cursor.ch + 1});
+                                if (this._autoScrollHideInputCanChange) {
+                                
+                                    unvpsc();
+                                }
+                            }
+                            else {
+
+                                unvpsc();
                             }
                             
                           
@@ -628,20 +653,15 @@
                                 $("#hide_input").val('');
                                 $("#hide_input").focus();
                             }
-                            else {
-                                
-                                if (_type == "hide_input_oninput") {
-                                    if (!this._autoScrollHideInputCanChange) {
-                                        return
-                                    }
-                                }
+                            else if (_type == "hide_input_oninput") {
                             
-                                var autoScrollheight = focusHeight - this._edit.display.cachedTextHeight;
-                                autoScrollheight = autoScrollheight * -1;
-                                autoScrollheight = autoScrollheight > 0 ? 0 : autoScrollheight;
-                                this._scroll._editScroll.scrollTo(0, autoScrollheight, 0);
-                                this._edit.replaceSelection(' ');
-                                this._edit.replaceRange('', {line: cursor.line, ch: cursor.ch}, {line: cursor.line, ch: cursor.ch + 1});
+                                if (this._autoScrollHideInputCanChange) {
+                                    upvpsc();
+                                }
+                            }
+                            else {
+
+                                upvpsc();
                             }
                         
                             
