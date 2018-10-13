@@ -72,12 +72,17 @@
 			.foot .toolsbar .tools-left .option{margin-right: 25px;float: left;display: block;}
 			.foot .toolsbar .tools-right {margin-right: 10px;height: 100%;float: right;overflow: hidden;}
 
-			#upload-file {width: 100%;height: 264px;float: left;position: relative;display:none;}
-			#upload-file .upload-type {margin: 80px auto;overflow: hidden;height: 64px;}
-			#upload-file .upload-type .img-btn {width: 60px;height: 64px;margin: auto 10px;float: left;text-align: center;position: relative;}
-			#upload-file .upload-type .img-btn i {margin: auto;cursor: pointer;}
-			#file-img-upload {width: 60px;height: 64px;position: absolute;top: 0;z-index: 999;opacity: 0;cursor: pointer;}
-			#upload-file .upload-msg {margin: 80px auto;overflow: hidden;display: none;}
+			#upload-file {width: 100%;height: 50px;float: left;position: relative;display:none;}
+            #upload-file .container-fluid {margin-left:10px;height:100%;width:calc(100% - 10px);float:left;overflow:hidden;}
+			#upload-file .upload-type {overflow: hidden;}
+			#upload-file .upload-type .upload-btn {margin-right: 25px;float: left;text-align: center;position: relative;height:50px;}
+			#upload-file .upload-type .upload-btn i {line-height: 50px;cursor: pointer;}
+			.file-upload-input {width: 100%;height: 100%;position: absolute;top: 0;z-index: 999;opacity: 0;cursor: pointer;}
+
+			#upload-file .upload-msg {width:100%;height:100%;overflow: hidden;display: none;float:left;position:absolute;top:0;left:0;}
+            #upload-file .upload-msg .progress {width:100%;height:100%;background-color:rgba(0, 0, 0, 0.8);}
+            #upload-file .upload-msg .progress-txt {color:#FFF;position:absolute;z-index:999;text-align:center;line-height:50px;width:100%;height:100%;}
+            #upload-file .upload-msg .progress-bar {float:left;width:0%;height:100%;background-color:rgb(48, 177, 50);position:absolute;top:0;left:0;}
 
 		</style>
 	</head>
@@ -120,6 +125,7 @@
                             <i id="insert-code" class="fa fa-code fa-lg option"></i>
                             <i id="insert-horizontal-rule" class="fa fa-minus fa-lg option"></i>
 							<i id="insert-list-ul" class="fa fa-list-ul fa-lg option"></i>
+                            <i id="insert-paperclip" class="fa fa-paperclip fa-lg option"></i>
                             <!--<i id="insert-list-ol" class="fa fa-list-ol fa-lg option"></i>-->
                             <i id="insert-check-square-o" class="fa fa-check-square-o fa-lg option"></i>
                             <i id="insert-square-o" class="fa fa-square-o fa-lg option"></i>
@@ -133,24 +139,34 @@
 					<div class="tools-right">
 						<i id="show-preview" class="fa fa-desktop fa-lg"></i>
 					</div>	
-				</div>
+				</div> 
 				<div id="upload-file">
 					<div class="container-fluid">
     					<div class="upload-type">
-    						<div class="img-btn">
-    							<input id="file-img-upload" accept="image/*" type="file">
-    							<i class="fa fa-file-image-o fa-4x"></i>
+    						<div class="upload-btn">
+    							<input class="file-upload-input" id="file-img-upload" accept="image/*" type="file">
+    							<i class="fa fa-file-image-o fa-lg option"></i>
+    						</div>
+                            <div class="upload-btn">
+    							<input class="file-upload-input" id="file-movie-upload" accept="video/*" type="file">
+    							<i class="fa fa-file-movie-o fa-lg option"></i>
+    						</div>
+                            <div class="upload-btn">
+    							<input class="file-upload-input" id="file-audio-upload" accept="audio/*" type="file">
+    							<i class="fa fa-file-audio-o fa-lg option"></i>
+    						</div>
+                            <div class="upload-btn">
+    							<input class="file-upload-input" id="file-file-upload" accept="" type="file">
+    							<i class="fa fa-file-o fa-lg option"></i>
     						</div>
     					</div>
-    					<div class="upload-msg">
-    						<div class="progress">
-								<div id="probar-img" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;width: 0%;">
-							    	0%
-								</div>
-							</div>
-    					</div>
 					</div>
-
+                    <div class="upload-msg">
+                        <div class="progress">
+                            <div class="progress-txt">0%</div>
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
 				</div>		
 			</div>
 			<div class="preview">
@@ -184,10 +200,14 @@
                     
                     if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
                         if (ua.indexOf('iPhone') > -1) {
-                            
+
                             if (ua.indexOf('MQQBrowser') > -1) {
                             
-                                return 'ios_iphone_mqq';
+                                return 'ios_iphone_mqqb';
+                            }
+                            else if (ua.indexOf('MicroMessenger') > -1) {
+                            
+                                return 'ios_iphone_mwxb';
                             }
                             else if (navigator.standalone) {
                             
@@ -297,6 +317,7 @@
                     this._additiveHeight = 0;
                     
                     this._firstOpenKey = true;
+                    this._enterOpenKey = true;
                     this._orientationMsg = false;
                     this._autoScrollHideInputCanChange = true;
                     
@@ -338,7 +359,7 @@
                         }.bind(this));
                         
                         $("#hide_input").bind('focus', function () {
-                            if (this._firstOpenKey) {
+                            if (this._firstOpenKey || this._enterOpenKey) {
                                 this.onKeyChange("open");
                                 $("#title").focus();
                             }
@@ -346,15 +367,17 @@
                         
                         $("#hide_input").bind('blur', function () {
 
-                            if (!this._firstOpenKey) {
+                            if (!this._firstOpenKey || !this._enterOpenKey) {
                             
                                 this.onKeyChange("close");
                             }
                         }.bind(this));
 
+                        /*
                         this._edit.on('focus', function () {
                             this.onKeyChange("open");
                         }.bind(this));
+                        */
                         
                         this._edit.on('blur', function () {
                             this.onKeyChange("close");
@@ -366,8 +389,9 @@
                                 return false;
                             }
                         
-                            if (this._firstOpenKey) {
+                            if (this._firstOpenKey || this._enterOpenKey) {
                                 this._firstOpenKey = false;
+                                this._enterOpenKey = false;
                             }
                             else {
                                 this.onKeyChange("open");
@@ -421,10 +445,14 @@
                     }
                     
                     window.onorientationchange = function () {
-                        this.setSize();
                         this._hideKey();
-                        
-                        this.ListenOrientation();
+                        this.listenOrientation();
+                                                
+                        setTimeout(function () {
+                            
+                            this.setSize();
+                            
+                        }.bind(this), 0);
                                                 
                     }.bind(this);
                     
@@ -482,7 +510,11 @@
                         }.bind(this));
                         
                         $('#md-wrapper').bind('touchmove', function (e) {
-                            //e.preventDefault();
+                            e.preventDefault();
+                        }.bind(this));
+                        
+                        $('.preview-foot').bind('touchmove', function (e) {
+                            e.preventDefault();
                         }.bind(this));
                     
                     }
@@ -520,7 +552,6 @@
                 
                 this._closeKey = function () {
                     var tbxTitle = $("#title")[0];
-                    var tbxContent = $(".content")[0];
                     
                     var titleFocus = (document.activeElement == tbxTitle);
                     var contentFocus = this._edit.hasFocus();
@@ -716,11 +747,10 @@
                 };
                 
                 this.setSize = function () {
-
                     var initfootheight = $('#foot').height() + 1; //broadheight
                     
-                    var viewHeight = $('.warpper').height();
-                    var content_height = viewHeight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
+                    var viewheight = $('.warpper').height();
+                    var content_height = viewheight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
                     $('.content').height(content_height);
                     
                     if (this._drvtype.indexOf('ios')  > -1) {
@@ -740,11 +770,13 @@
                     }
 
                     $('.tools-left-warpper').width(foot_tools_wrapper_width);
+
+                    
                 };
                 
-                this.ListenOrientation = function () {
+                this.listenOrientation = function () {
                     
-                    if (this._drvtype.indexOf('ios') > -1 || true) {
+                    if (this._drvtype.indexOf('ios') > -1) {
                     
                         if (window.orientation == 90 || window.orientation == -90) {
                         
@@ -777,13 +809,17 @@
                     this._isPreven = false;
                 };
                 
+                
                 this.onKeyChange = function (_type) {
-
-                    if (_type == "open") {
-                        this._openKey();
-                    }
-                    else {
-                        setTimeout(this._closeKey.bind(this), 100);
+                    
+                    if (this._drvtype.indexOf('ios') > -1) {
+                    
+                        if (_type == "open") {
+                            this._openKey();
+                        }
+                        else {
+                            setTimeout(this._closeKey.bind(this), 100);
+                        }
                     }
 
                 };
@@ -791,7 +827,7 @@
                 this.autoOpenIosKey = function () {
                 
                     if (window.orientation != 90 && window.orientation != -90) {
-                    
+                        this._enterOpenKey = true;
                         $("#hide_input").focus();
                     }
                 }
@@ -1069,7 +1105,7 @@
                         $(".new-file-msg").bind("click", function () {
                             
                             document.activeElement.blur();
-                            sch.ListenOrientation();
+                            sch.listenOrientation();
                             sch.autoOpenIosKey();
                             $(".new-file-msg").hide();
                         });
@@ -1121,10 +1157,18 @@
 		            }
 		        };
                 
-                
                 rendererMD.heading = function (text, level) {
                     //var escapedText = text.toLowerCase().replace(/[^\w]+/g, '-');
                     var escapedText = text.toLowerCase();
+                                  
+                    if (typeof(headList) != 'undefined') {
+                        headList.push({
+                            level: level,
+                            test: text,
+                            id: escapedText
+                        });
+                    }
+                    
                     return "<h" + level + ">" + 
                                "<a id=\"" + escapedText + "\" class=\"anchor\" aria-hidden=\"true\" href=\"#" + escapedText + "\">" +
                                    "<svg class=\"octicon octicon-link\" viewBox=\"0 0 16 16\" version=\"1.1\" width=\"16\" height=\"16\" aria-hidden=\"true\">" + 
@@ -1154,16 +1198,28 @@
                 dc = new DocCache(CodeMirrorEditor);
                 srh = new scrollHelper(CodeMirrorEditor);
                 sch = new screenHelper(CodeMirrorEditor, srh);
+                headList = new Array();
                 
 
 				//CodeMirrorEditor.setOption('lineNumbers', true);
                 //CodeMirrorEditor.inputStyle
                 
+                CodeMirrorEditor.on('focus', function () {
+                    $('.foot').height(49);
+                    sch.setSize();
+                    
+                    sch.onKeyChange("open");
+                });
+                
 				CodeMirrorEditor.on('change', function () {
                 
-					$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
-                    dc.cache(CodeMirrorEditor.getValue());
-                    srh.refReshHtml();
+                    if (utilTools().checkDriver().indexOf("ios") == -1 && utilTools().checkDriver().indexOf("android") == -1) {
+                    
+                        $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
+                        dc.cache(CodeMirrorEditor.getValue());
+                        srh.refReshHtml();
+                    }
+					
 
 					var ec = CodeMirrorEditor.changeGeneration();
 
@@ -1198,30 +1254,9 @@
                     setTimeout(function () {
                         sch.autoScroll();
                     }, 0);
-                    
-                    
-                    
-                    //console.log(CodeMirrorEditor)
-                    
-                    
-                    
+
 				});
-                
-                CodeMirrorEditor.on('beforeChange', function (_event) {
-                                    
-                    //console.log("beforeChange")
-                    
-                    
-                    return false;
-				});
-                
-                CodeMirrorEditor.on('scrollCursorIntoView', function (_event) {
-                                    
-                    //console.log("scrollCursorIntoView")
-                    
-                    return false;
-				});
-                
+
 				$('#head-goback').bind('click', function () {
 					history.go(-1);
 				});
@@ -1229,6 +1264,14 @@
 				$('#show-preview').bind('click', function () {
 					//关闭软键盘
 					document.activeElement.blur();
+                    
+                    if (utilTools().checkDriver().indexOf("ios") > -1 || utilTools().checkDriver().indexOf("android") > -1) {
+                    
+                        $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
+                        dc.cache(CodeMirrorEditor.getValue());
+                        srh.refReshHtml();
+                    }
+                    
 					showPreview();
 				});
 
@@ -1236,7 +1279,7 @@
 					document.activeElement.blur();
                     sch.autoOpenIosKey();
 					hidePreview();
-                    sch.ListenOrientation();
+                    sch.listenOrientation();
 
 				});
 
@@ -1333,6 +1376,7 @@
 				$('#insert-media').bind('click', function () {
 
 					hideKeyboard();
+                    //sch.preventChange();
 
 					var footheight = $('#upload-file').height() + 49 + 1;//broad height
 
@@ -1346,11 +1390,12 @@
                     
                     $('.foot').height(footheight);
                     
+                    //CodeMirrorEditor.focus();
+                    
                     sch.setSize();
                     
                     
 
-					//$('.foot').animate({height: footheight}, 300);
 
 				});
 
@@ -1399,6 +1444,40 @@
 					CodeMirrorEditor.replaceSelection('- ' + selctx)
 					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+				});
+                
+                $('#insert-paperclip').bind('click', function () {
+                    sch.preventChange();
+					var cursor = CodeMirrorEditor.getCursor();
+                    
+                    marked(CodeMirrorEditor.getValue())
+                    
+                    var paperclip = '**目录**  \n';
+                    var toplevel = 1;
+                    
+
+                    for (var i = 0; i < headList.length; i++) {
+                        
+                        if (i == 0) {
+                            toplevel = headList[i].level;
+                        }
+                        
+                        var ex_level_txt = '';
+                        
+                        for (var j = 0; j < headList[i].level - toplevel; j++) {
+                            ex_level_txt += '- '
+                        }
+                    
+                        paperclip += '- ' + ex_level_txt + '[' + headList[i].test + '](#' + headList[i].id + ')  \n';
+                    }
+                    
+                    CodeMirrorEditor.replaceSelection(paperclip)
+					CodeMirrorEditor.focus();					
+					CodeMirrorEditor.setCursor(cursor.line, cursor.ch);
+                    
+                    headList = [];
+                    
+					
 				});
 
                 $('#insert-check-square-o').bind('click', function () {
@@ -1477,9 +1556,10 @@
 		            ftlwm = true;
 			    });
 
-			    $('#file-img-upload').bind('change', function () {
-			    	var obj = document.getElementById('file-img-upload');
-
+			    $('.file-upload-input').bind('change', function () {
+			    	//var obj = document.getElementById('file-img-upload');
+                    var obj = this;
+                                        
 			    	if (obj.files) {
 
 			            for (var i = 0; i < obj.files.length; i++) {
@@ -1491,7 +1571,7 @@
 			                    return function (evt) {
 
 			                    	
-			                        upload_img(file);
+			                        upload_file(file);
 			                    }
 
 			                })(obj.files[i]);
@@ -1502,8 +1582,6 @@
 			        }
 
 			    });
-                
-                
 
 			}
 
@@ -1706,9 +1784,9 @@
 			}
 
 
-		    function upload_img(file) {
+		    function upload_file(file) {
 
-		    	$('.upload-type').hide();
+		    	$('.container-fluid').hide();
 			    $('.upload-msg').show();
 
 		        var xhr = new XMLHttpRequest();
@@ -1716,9 +1794,8 @@
 		        xhr.upload.addEventListener('progress', function(evt) {
 		            if (evt.lengthComputable) {
 		            	var percentComplete = parseInt(evt.loaded / evt.total * 100);
-		            	$('#probar-img').html(percentComplete + '%');
-		            	$('#probar-img').attr('aria-valuenow', percentComplete);
-		            	$('#probar-img').width(percentComplete + '%');
+		            	$('#upload-file .upload-msg .progress-txt').html(percentComplete + '%');
+		            	$('#upload-file .upload-msg .progress-bar').width(percentComplete + '%');
 		            	
 		            }
 
@@ -1727,24 +1804,30 @@
 		        xhr.addEventListener('load', function(evt) {
 
 		        	if (evt.currentTarget.status == 200) {
-						
 
 		        		var result = $.parseJSON(evt.currentTarget.responseText);
 
 		        		var cursor = CodeMirrorEditor.getCursor();
-		        		var imgmd = '![' + result.name + '](' + result.url + ')';
-						CodeMirrorEditor.replaceSelection(imgmd)
-						CodeMirrorEditor.focus();					
-						CodeMirrorEditor.setCursor(cursor.line, cursor.ch + imgmd.length);
+                        
+                        var filemd = '[' + result.name + '](' + result.url + ')';
+                        
+                        if (file.type.indexOf("image") > -1) {
+                            filemd = '![' + result.name + '](' + result.url + ')';
+                        }
+                        
+						CodeMirrorEditor.replaceSelection(filemd)
+						//CodeMirrorEditor.focus();					
+						CodeMirrorEditor.setCursor(cursor.line, cursor.ch + filemd.length);
 		        		
-                		$('.upload-type').show();
+                		$('.container-fluid').show();
 				        $('.upload-msg').hide();
 
-				        $('#probar-img').html('0%');
-			            $('#probar-img').attr('aria-valuenow', 0);
-			            $('#probar-img').width('0%');
+				        $('#upload-file .upload-msg .progress-txt').html('0%');
+			            $('#upload-file .upload-msg .progress-bar').width('0%');
+                        
+                        
+                        //sch.setSize();
 
-			            $('.foot').animate({height: 35}, 300);
             		}
 		        	
 		            
@@ -1760,7 +1843,7 @@
 		        }, false);
 
 		        // 开始上传
-		        xhr.open('POST', '/user/uploadimg/' + file.name + "/" + file.type, true);
+		        xhr.open('POST', '/user/uploadfile/' + file.name + "/" + file.type, true);
 		        xhr.send(file);  
 		        
 		    }

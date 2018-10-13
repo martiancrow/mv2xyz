@@ -29,7 +29,7 @@ class ua_user(db.Model):
     ua_user_nick = db.Column(db.String(64), unique=True, index=True)
     ua_pwd_hash = db.Column(db.String(128))
     ua_email_confirmed = db.Column(db.Boolean, default=False)
-    ua_creattime = db.Column(db.DateTime(), default=datetime.utcnow)
+    ua_createtime = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
     posts = db.relationship('res_post', backref='author', lazy='dynamic', cascade="all, delete-orphan")
 
@@ -111,7 +111,7 @@ class ua_session(db.Model):
     user_id = db.Column(db.Integer)
     ua_sb_exceed = db.Column(db.SmallInteger, default=7200)
     ua_sb_lastheart = db.Column(db.BigInteger, default=time.time)
-    ua_sb_creattime = db.Column(db.BigInteger, default=time.time)
+    ua_sb_createtime = db.Column(db.BigInteger, default=time.time)
     ua_sd_datas = db.relationship('ua_session_data', backref='base', lazy='dynamic', cascade="all, delete-orphan")
 
 

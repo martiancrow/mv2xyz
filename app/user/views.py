@@ -42,11 +42,17 @@ def index():
     return render_template('user/index.html')
 
 @user.route('/postlistjson/<int:page>', methods=['GET'])
+@user.route('/postlistjson/<int:page>/<int:cid>', methods=['GET'])
 @login_required
-def post_list_json(page):
+def post_list_json(page, cid=None):
 
-    pagination = res_post.query.order_by(res_post.post_updatetime.desc()).paginate(
-        page, per_page=20, error_out=False)
+    if cid:
+        pagination = res_post.query.filter_by(author_id=current_user.user.ua_user_id, post_cid=cid).order_by(res_post.post_updatetime.desc()).paginate(
+            page, per_page=20, error_out=False)
+    else:
+        pagination = res_post.query.filter_by(author_id=current_user.user.ua_user_id).order_by(res_post.post_updatetime.desc()).paginate(
+            page, per_page=20, error_out=False)
+            
     posts = pagination.items
 
     result = {
@@ -63,7 +69,7 @@ def post_list_json(page):
             'title': cutstr(item.post_name, 35),
             'update': item.post_updatetime,
             'summary': get_body_summary(item.post_body_html, 100),
-            'creat': item.post_creattime
+            'creat': item.post_createtime
         }
 
         result['posts'].append(post)
@@ -160,18 +166,18 @@ def edit_post(postid):
 
     return render_template('user/mdedit.html', title=title, content=content, postid=postid, updatetime=updatetime)
 
-@user.route('/uploadimg/<file_name>/<path:type_name>', methods=['POST'])
+@user.route('/uploadfile/<file_name>/<path:type_name>', methods=['POST'])
 def upload_img(file_name, type_name):
 
-    image = res_file(file_name=file_name, file_type=type_name, file_data=request.data)
-    db.session.add(image)
+    filemodel = res_file(file_name=file_name, file_type=type_name, file_data=request.data, file_uid=current_user.user.ua_user_id)
+    db.session.add(filemodel)
     db.session.commit()
 
     result = {
         'code': 200,
-        'name': image.file_name,
+        'name': filemodel.file_name,
         #'url': current_app.config['WEB_HOST'] + url_for('user.file_get', fileid=image.file_id)
-        'url': url_for('user.file_get', fileid=image.file_id)
+        'url': url_for('user.file_get', fileid=filemodel.file_id)
     }
 
     return jsonify(result)

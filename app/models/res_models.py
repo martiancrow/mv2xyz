@@ -11,16 +11,31 @@ from flask import current_app, request, after_this_request
 from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT
 from .. import db, login_manager
 
+class res_postclass(db.Model):
+    __tablename__ = 'res_postclasses'
+    postclass_id = db.Column(db.Integer, primary_key=True)
+    postclass_uid = db.Column(db.Integer, db.ForeignKey('ua_users.ua_user_id'))
+    postclass_name = db.Column(db.String(128))
+    postclass_createtime = db.Column(db.DateTime(), default=datetime.utcnow)
+
+    def __init__(self, **kwargs):
+        super(res_postclass, self).__init__(**kwargs)
+
+    
+    def __repr__(self):
+        return '<res_postclass %r>' % self.postclass_name
+
 class res_post(db.Model):
     __tablename__ = 'res_posts'
     post_id = db.Column(db.Integer, primary_key=True)
     post_pid = db.Column(db.Integer, db.ForeignKey('res_posts.post_id'), default=0)
+    post_cid = db.Column(db.Integer, db.ForeignKey('res_postclasses.postclass_id'), default=0)
     author_id = db.Column(db.Integer, db.ForeignKey('ua_users.ua_user_id'))
     post_name = db.Column(db.String(64))
     post_body_md = db.Column(LONGTEXT)
     post_body_html = db.Column(LONGTEXT)
     post_updatetime = db.Column(db.DateTime(), default=datetime.utcnow)
-    post_creattime = db.Column(db.DateTime(), default=datetime.utcnow)
+    post_createtime = db.Column(db.DateTime(), default=datetime.utcnow)
     chilposts = db.relationship('res_post', lazy='dynamic', cascade="all, delete-orphan")
 
     def __init__(self, **kwargs):
@@ -78,18 +93,21 @@ db.event.listen(res_post.post_body_md, 'set', res_post.on_changed_body)
 class res_file(db.Model):
     __tablename__ = 'res_files'
     file_id = db.Column(db.Integer, primary_key=True)
+    file_uid = db.Column(db.Integer, db.ForeignKey('ua_users.ua_user_id'))
     file_name = db.Column(db.String(128))
     file_type = db.Column(db.String(64))
     file_data = db.Column(LONGBLOB)
     file_isextern = db.Column(db.Boolean, default=False)
     file_uri = db.Column(db.String(512))
-    file_creattime = db.Column(db.DateTime(), default=datetime.utcnow)
+    file_createtime = db.Column(db.DateTime(), default=datetime.utcnow)
 
     def __init__(self, **kwargs):
         super(res_file, self).__init__(**kwargs)
 
     
     def __repr__(self):
-        return '<ua_session %r>' % self.ua_sb_key
+        return '<res_file %r>' % self.file_name
+        
+
 
 
