@@ -1,0 +1,277 @@
+{% if cid %}
+<input id="classid" type="hidden" value="{{ cid }}"/>
+{% endif %}
+
+{% if mvtype %}
+<input id="mvtype" type="hidden" value="{{ mvtype }}"/>
+<input id="optid" type="hidden" value="{{ optid }}"/>
+{% endif %}
+
+<div id="class_set_view">
+    <input id="setcid" type="hidden" value="0"/>
+    <div class="set-name">
+        <input type="text" value="新建文件夹"/>
+    </div>
+    <div class="set-button">
+        <div class="set">
+            确定
+        </div>
+        <div class="cancel">
+            取消
+        </div>
+    </div>
+</div>
+
+<div id="move_classes" class="container-fluid">
+    <div class="row">
+        <div class="move-class-global-option">
+            <div class="option-item class-add">
+                新建文件夹
+            </div>
+            <div class="option-item class-move">
+                移动到此处
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="row">
+        <div class="class-item">
+            <div class="class-name">
+                <h2><a href="url">新建文件夹</a></h2>
+            </div>
+            <div class="class-summary">
+                
+            </div>
+            <div class="class-footer">
+                <span>2018.10.17</span>
+            </div>
+            <div class="class-option" style="right:0;">
+                <div class="class-option-left">
+
+                </div>
+                <div class="class-option-right">
+                    
+                    <div class="button-item">
+                        <div class="button del">
+                            <i class="del-class fa fa-trash-o" v-bind:class_id="id"></i>
+                        </div>
+                    </div>
+                    <div class="button-item">
+                        <div class="button edit">
+                            <i class="edit-class fa fa-pencil" v-bind:class_id="id"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+
+
+
+<div id="template" style="display: none;">
+    <div class="row">
+        
+        <div class="class-item">
+            <div class="class-name">
+                <h2><a v-bind:href="move_url">${ name }</a></h2>
+            </div>
+            <div class="class-footer">
+                <span>${ creat }</span>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/locale/zh-cn.js"></script>
+
+<script type="text/javascript">
+
+    window.onload = function () {
+    
+        $(".move-class-global-option .class-add").bind('click', function (_evt) {
+            var setview = $("#class_set_view");
+            var setviewinput = setview.find("input[type='text']");
+            setview.show();
+            setviewinput.focus().select();
+            setviewinput.selectionStart = 0;
+            setviewinput.selectionEnd = setviewinput.val().length;
+        });
+        
+        $(".move-class-global-option .class-move").bind('click', function (_evt) {
+            editclass();
+        });
+    
+        $("#class_set_view .set").bind('click', function (_evt) {
+            addclass();
+        });
+        
+        $("#class_set_view .cancel").bind('click', function (_evt) {
+            var setview = $("#class_set_view");
+            var setviewinput = setview.find("input[type='text']");
+            var setviewcid = setview.find("input[type='hidden']");
+            setview.hide();
+            setviewinput.val("新建文件夹");
+            setviewcid.val("0");
+            
+        });
+
+        $(window).scroll(function () {
+            var scrolltop = $(this).scrollTop();
+            var scrollheight = $(document).height();
+            var windowheight = $(this).height();
+
+            if (scrolltop + windowheight > scrollheight - 100) {
+                getclass();
+            }
+        });
+        
+        getclass();
+    };
+
+    function addclass() {
+
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+            
+            var postclass_name = $('#class_set_view input[type="text"]').val();
+            var postclass_pid = $('#classid').length > 0 ? $('#classid').val() : "0";
+            var posturl = "/user/class/mv/add";
+
+            $.ajax({
+                type: 'POST',
+                url: posturl,
+                data: 'name=' + postclass_name + '&pid=' + postclass_pid,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.code == 200) {
+                            var cid = $("#classid").length == 0 ? 0 : $("#classid").val();
+                            window.location.href = result.nexturl;
+                        }
+                    }
+
+                    issubmit = false;
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+    
+    function editclass() {
+        
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+        
+            var mvtype = $('#mvtype').length > 0 ? $('#mvtype').val() : "class";
+            var optid = $('#optid').length > 0 ? $('#optid').val() : "0";
+            var pid = $('#classid').length > 0 ? $('#classid').val() : "0";
+            var posturl = "/user/class/edit/" + optid;
+            var postdata = 'pid=' + pid;
+            
+            if (mvtype == "post") {
+                posturl = "/user/edit/" + optid;
+                postdata = 'classid=' + pid;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: posturl,
+                data: postdata,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.code == 200) {
+                            window.location.href = result.nexturl;
+                        }
+                    }
+
+                    issubmit = false;
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+    
+
+    function getclass() {
+
+        if (typeof(nexturi) == 'undefined') {
+            nexturi = '/user/class/classlistjson/1'
+            nexturi += $("#classid").length > 0 ? "/" + $("#classid").val() : "";
+        }
+        
+
+        if (nexturi == null) {
+            return;
+        }
+
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+
+            $.ajax({
+                type: 'GET',
+                url: nexturi,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.hasnext) {
+                            nexturi = result.nexturi;
+                        }
+                        else {
+                            nexturi = null;
+                        }
+
+                        var template_html = $('#template').html();
+                        var mvtype = $('#mvtype').length > 0 ? $('#mvtype').val() : "class";
+                        var optid = $('#optid').length > 0 ? $('#optid').val() : "0";
+
+                        for (var i = 0; i < result.classes.length; i++) {
+
+                            new Vue({
+                                el: '#template',
+                                data: {
+                                    name: result.classes[i].name,
+                                    move_url: result.classes[i].move_url + "/" + mvtype + "/" + optid,
+                                    creat: moment(result.classes[i].creat).format('YYYY.MM.DD')
+                                },
+                                delimiters:['${', '}']});
+
+                            $('#move_classes').append($('#template').html());
+
+                            $('#template').html(template_html)
+                        }
+                    }
+
+                    issubmit = false;
+
+
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+
+    
+</script>
+

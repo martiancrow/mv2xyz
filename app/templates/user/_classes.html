@@ -1,0 +1,612 @@
+{% if cid %}
+<input id="classid" type="hidden" value="{{ cid }}"/>
+{% endif %}
+
+<div id="class_set_view">
+    <input id="setcid" type="hidden" value="0"/>
+    <div class="set-name">
+        <input type="text" value="新建文件夹"/>
+    </div>
+    <div class="set-button">
+        <div class="set">
+            确定
+        </div>
+        <div class="cancel">
+            取消
+        </div>
+    </div>
+</div>
+
+<div id="classes" class="container-fluid">
+    <div class="row">
+        <div class="class-global-option">
+            <div class="class-add">
+                新建文件夹
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="row">
+        <div class="class-item">
+            <div class="class-name">
+                <h2><a href="url">新建文件夹</a></h2>
+            </div>
+            <div class="class-summary">
+                
+            </div>
+            <div class="class-footer">
+                <span>2018.10.17</span>
+            </div>
+            <div class="class-option" style="right:0;">
+                <div class="class-option-left">
+
+                </div>
+                <div class="class-option-right">
+                    
+                    <div class="button-item">
+                        <div class="button del">
+                            <i class="del-class fa fa-trash-o" v-bind:class_id="id"></i>
+                        </div>
+                    </div>
+                    <div class="button-item">
+                        <div class="button edit">
+                            <i class="edit-class fa fa-pencil" v-bind:class_id="id"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+
+
+
+<div id="template" style="display: none;">
+    <div class="row">
+        
+        <div class="class-item">
+            <div class="class-name">
+                <h2><a v-bind:href="class_url">${ name }</a></h2>
+            </div>
+            <div class="class-summary">
+                <span><a v-bind:href="post_url">共有文章:${ post_count }篇</a></span>
+            </div>
+            <div class="class-footer">
+                <span>${ creat }</span>
+            </div>
+            <div class="class-option">
+                <div class="class-option-left">
+
+                </div>
+                <div class="class-option-right">
+                    <div class="button-item">
+                        <div class="button del">
+                            <i class="del-class fa fa-trash-o" v-bind:class_id="id"></i>
+                        </div>
+                    </div>
+                    <div class="button-item">
+                        <div class="button edit">
+                            <i class="edit-class fa fa-pencil" v-bind:class_id="id" v-bind:class_name="name"></i>
+                        </div>
+                    </div>
+                    <div class="button-item">
+                        <div class="button move">
+                            <i class="move-class fa fa-folder-o" v-bind:class_id="id"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/locale/zh-cn.js"></script>
+
+<script type="text/javascript">
+
+    window.onload = function () {
+    
+        $(".class-global-option .class-add").bind('click', function (_evt) {
+            var setview = $("#class_set_view");
+            var setviewinput = setview.find("input[type='text']");
+            setview.show();
+            setviewinput.focus().select();
+            setviewinput.selectionStart = 0;
+            setviewinput.selectionEnd = setviewinput.val().length;
+        });
+        
+        $("#class_set_view .set").bind('click', function (_evt) {
+            var setview = $("#class_set_view");
+            var setcid = setview.find("input[type='hidden']");
+            
+            if (setcid.length > 0 && setcid.val() != 0) {
+                editclass(setcid.val());
+            }
+            else {
+                addclass();
+            }
+            
+        });
+        
+        $("#class_set_view .cancel").bind('click', function (_evt) {
+            var setview = $("#class_set_view");
+            var setviewinput = setview.find("input[type='text']");
+            var setviewcid = setview.find("input[type='hidden']");
+            setview.hide();
+            setviewinput.val("新建文件夹");
+            setviewcid.val("0");
+            
+        });
+
+        $("body").on("touchstart", ".class-item", function (_evt) {
+
+            var opt = $(this).find(".class-option");
+
+            var touch;
+
+            if (window.navigator.msPointerEnabled) {
+                touch = _evt;
+            } else {
+                touch = _evt.originalEvent.touches[0];
+            }
+
+            PreCorrds = touchCoords(touch);
+            TouchItem = $(this);
+            PostItemTouch = true;
+            PreOptRight = parseFloat(opt.css("right"));
+
+            if (typeof (PrePostItemOptedTouch) != 'undefined' && !TouchItem.is(PrePostItemOptedTouch)) {
+
+                
+
+                var opt = PrePostItemOptedTouch.find(".class-option");
+                var optright = parseInt(opt.css("right"));
+                var optwidth = opt.width();
+
+                if (optright > -optwidth) {
+                    opt.animate({ right: -optwidth }, 300);
+                }
+
+            }
+
+            
+        });
+
+        $("body").on("touchmove", ".class-item", function (_evt) {
+
+            var touch;
+
+            if (window.navigator.msPointerEnabled) {
+                touch = _evt;
+            } else {
+                touch = _evt.originalEvent.touches[0];
+            }
+
+            var nowcorrds = touchCoords(touch);
+
+            if (typeof (PostItemTouch) != 'undefined' && PostItemTouch) {
+
+                if (nowcorrds) {
+
+                    var horizontalchange = Math.abs(nowcorrds.x - PreCorrds.x);
+                    var verticalchange = Math.abs(nowcorrds.y - PreCorrds.y);
+
+
+                    var opt = TouchItem.find(".class-option");
+                    var optwidth = opt.width();
+                    var optright = parseFloat(opt.css("right"));
+                    var mvx = 0;
+
+                    //if (typeof (PostItemTouching) == 'undefined' && !PostItemTouching) {
+                    if ((optright == 0 || optright == -optwidth) && typeof (PostItemTouching) != 'undefined' && !PostItemTouching) {
+                        if (verticalchange > 4) {
+                            PostItemTouch = false;
+                            PostItemTouching = false;
+
+                            return false;
+                        }
+                    }
+
+                    PostItemTouching = true;
+
+
+                    if (PreOptRight == 0) {
+                        mvx = PreCorrds.x - nowcorrds.x;
+                    }
+                    else {
+                        mvx = -optwidth - (nowcorrds.x - PreCorrds.x);
+                    }
+
+                    if (mvx <= 0 && mvx >= -1 * optwidth) {
+
+                        opt.css("right", mvx);
+                    }
+                    else if (mvx > 0) {
+                        opt.css("right", 0);
+                    }
+                    else if (mvx < -1 * optwidth) {
+                        opt.css("right", -1 * optwidth);
+                    }
+
+                    if (nowcorrds.x > PreCorrds.x) {
+                        TouchDirect = "right";
+                    }
+                    else if (nowcorrds.x < PreCorrds.x) {
+                        TouchDirect = "left";
+                    }
+
+                    _evt.preventDefault();
+                    //return false;
+                }
+            }
+
+
+        });
+
+        $("body").on("touchend", ".class-item", function (_evt) {
+
+            
+            if (typeof (PostItemTouch) != 'undefined' && PostItemTouch) {
+
+                var opt = TouchItem.find(".class-option");
+                var optwidth = opt.width();
+
+
+                if (typeof (TouchDirect) != 'undefined') {
+
+                    if (TouchDirect == "left") {
+
+                        PrePostItemOptedTouch = TouchItem;
+                        opt.css("right", 0);
+                        
+                    }
+                    else {
+                        opt.css("right", -1 * optwidth);
+                    }
+                }
+
+                PostItemTouching = false;
+                PostItemTouch = false;
+                
+
+            }
+
+
+        });
+
+        $("body").bind('touchmove', function (_evt) {
+
+            if (typeof (PostItemTouching) == 'undefined' || !PostItemTouching) {
+
+                if (typeof (PrePostItemOptedTouch) != 'undefined') {
+
+                    var opt = PrePostItemOptedTouch.find(".class-option");
+                    var optright = parseInt(opt.css("right"));
+                    var optwidth = opt.width();
+
+
+                    if (optright <= 0 && optright > -optwidth) {
+
+                        opt.css("right", optright - 4);
+                    }
+                }
+
+
+
+            }
+        });
+
+
+        $("#classes").bind('touchmove', function (_evt) {
+            if (typeof (PostItemTouching) != 'undefined' && PostItemTouching) {
+                _evt.preventDefault();
+                //return false
+            }
+
+        });
+
+        $("#classes").bind('touchend', function (_evt) {
+
+            if (typeof (PostItemTouching) == 'undefined' || !PostItemTouching) {
+                if (typeof (PrePostItemOptedTouch) != 'undefined') {
+
+                    var opt = PrePostItemOptedTouch.find(".class-option");
+                    var optright = parseInt(opt.css("right"));
+                    var optwidth = opt.width();
+
+                    if (optright > -optwidth) {
+                        opt.animate({ right: -optwidth }, 600);
+                    }
+                }
+            }
+            
+            
+
+
+        });
+
+
+        $("body").on("mouseenter", ".class-item", function (_evt) {
+
+            if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
+                var obj = $(this);
+                var opt = obj.find(".class-option");
+
+                opt.css("right", 0);
+            }
+            
+        });
+
+        $("body").on("mouseleave", ".class-item", function (_evt) {
+
+            if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
+                var obj = $(this);
+                var opt = obj.find(".class-option");
+
+
+                opt.css("right", -1 * opt.width());
+            }
+        });
+
+        $("body").on("click", ".del-class", function (_evt) {
+            if (confirm('确定要删除文件夹么,文件夹下文章也会同时删除!') == true) {
+                var obj = $(this);
+                deleteclass(obj.attr("class_id"));
+            }
+            
+            return false;
+        });
+
+        $("body").on("touchstart", ".del-class", function (_evt) {
+            if (confirm('确定要删除本笔记么,删除后将不可恢复!') == true) {
+                var obj = $(this);
+                deleteclass(obj.attr("class_id"));
+            }
+
+            return false;
+        });
+        
+        
+        $("body").on("click", ".edit-class", function (_evt) {
+            showclseditview($(this));
+            return false;
+        });
+
+        $("body").on("touchstart", ".edit-class", function (_evt) {
+            showclseditview($(this));
+            return false;
+        });
+        
+        $("body").on("click", ".move-class", function (_evt) {
+            showclsmoveview($(this));
+            return false;
+        });
+
+        $("body").on("touchstart", ".move-class", function (_evt) {
+            showclsmoveview($(this));
+            return false;
+        });
+
+        $(window).scroll(function () {
+            var scrolltop = $(this).scrollTop();
+            var scrollheight = $(document).height();
+            var windowheight = $(this).height();
+
+            if (scrolltop + windowheight > scrollheight - 100) {
+                getclass();
+            }
+        });
+        
+        getclass();
+    };
+    
+    function showclseditview (_obj) {
+        var obj = _obj;
+        var setview = $("#class_set_view");
+        var setviewinput = setview.find("input[type='text']");
+        var setcid = setview.find("input[type='hidden']");
+        setviewinput.val(obj.attr("class_name"));
+        setcid.val(obj.attr("class_id"))
+        setview.show();
+        setviewinput.focus().select();
+        setviewinput.selectionStart = 0;
+        setviewinput.selectionEnd = setviewinput.val().length;
+        
+    }
+    
+    function showclsmoveview (_obj) {
+        var obj = _obj;
+        var optid = obj.attr('class_id');
+        var pid = $('#classid').length > 0 ? $('#classid').val() : "0";
+        window.location.href = "/user/moveclass/" + pid + "/class/" + optid;
+        
+    }
+
+    function touchCoords(touch) {
+
+        if (touch.pageX || touch.pageY) {
+            return { x: touch.pageX, y: touch.pageY };
+        }
+        else {
+
+            return {
+                x: touch.clientX + document.body.scrollLeft - document.body.clientLeft,
+                y: touch.clientY + document.body.scrollTop - document.body.clientTop
+            };
+        }
+    }
+
+    function addclass() {
+        
+
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+            
+            var postclass_name = $('#class_set_view input[type="text"]').val();
+            var postclass_pid = $('#classid').length > 0 ? $('#classid').val() : "0";
+            var posturl = "/user/class/add";
+
+            $.ajax({
+                type: 'POST',
+                url: posturl,
+                data: 'name=' + postclass_name + '&pid=' + postclass_pid,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.code == 200) {
+                            window.location.href = result.nexturl;
+                        }
+                    }
+
+                    issubmit = false;
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+    
+    function deleteclass(_classid) {
+        if (typeof (issubmit) == 'undefined' || !issubmit) {
+
+            var geturl = '/user/class/del/';
+            geturl += _classid
+
+            $.ajax({
+                type: 'GET',
+                url: geturl,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.code == 200) {
+                            window.location.href = result.nexturl;
+                        }
+                        else {
+                            alert('删除失败')
+                        }
+                    }
+
+                    issubmit = false;
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+    
+    function editclass(_cid) {
+        
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+            
+            var postclass_name = $('#class_set_view input[type="text"]').val();
+            var postclass_pid = $('#classid').length > 0 ? $('#classid').val() : "0";
+            var posturl = "/user/class/edit/" + _cid;
+
+            $.ajax({
+                type: 'POST',
+                url: posturl,
+                data: 'name=' + postclass_name + '&pid=' + postclass_pid,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.code == 200) {
+                            window.location.href = result.nexturl;
+                        }
+                    }
+
+                    issubmit = false;
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+
+
+    function getclass() {
+
+        if (typeof(nexturi) == 'undefined') {
+            nexturi = '/user/class/classlistjson/1'
+            nexturi += $("#classid").length > 0 ? "/" + $("#classid").val() : "";
+        }
+        
+
+        if (nexturi == null) {
+            return;
+        }
+
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+
+            $.ajax({
+                type: 'GET',
+                url: nexturi,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.hasnext) {
+                            nexturi = result.nexturi;
+                        }
+                        else {
+                            nexturi = null;
+                        }
+
+                        var template_html = $('#template').html();
+
+                        for (var i = 0; i < result.classes.length; i++) {
+
+                            new Vue({
+                                el: '#template',
+                                data: {
+                                    id: result.classes[i].id,
+                                    name: result.classes[i].name,
+                                    post_url: result.classes[i].post_url,
+                                    class_url: result.classes[i].class_url,
+                                    post_count: result.classes[i].post_count,
+                                    creat: moment(result.classes[i].creat).format('YYYY.MM.DD')
+                                },
+                                delimiters:['${', '}']});
+
+                            $('#classes').append($('#template').html());
+
+                            $('#template').html(template_html)
+                        }
+                    }
+
+                    issubmit = false;
+
+
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+
+    
+</script>
+

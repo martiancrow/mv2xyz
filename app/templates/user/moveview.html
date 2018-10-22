@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}mv2{% endblock %}
+
+{% block navbar %}
+<div class="move-class-head">
+    <div class="move-class-head-left">
+        <div class="item backspace">
+            <a href="javascript:history.go(-1);">
+                <i class="fa fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+    <div class="move-class-head-title">
+        <h2>{{ title }}</h2>
+    </div>
+    <div class="move-class-head-right">
+        <div class="item cancel">
+            <a href="{{ cancelurl }}">
+                <i class="fa fa-times"></i>
+            </a>
+        </div>
+        <div class="item levelup">
+            <a href="{{ levelupurl }}">
+                <i class="fa fa-arrow-up"></i>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block page_content %}
+{% include 'user/_mvclasses.html' %}
+{% endblock %}
+
+{% block page_foot %}
+{% endblock %}

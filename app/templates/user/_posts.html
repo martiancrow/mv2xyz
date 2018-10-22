@@ -1,23 +1,47 @@
+{% if cid %}
+<input id="classid" type="hidden" value="{{ cid }}">
+{% endif %}
+
 <div id="posts" class="container-fluid">
     
 </div>
 
+
+
 <div id="template" style="display: none;">
     <div class="row">
-        <a v-bind:href="url">
-            <div class="post-item">
-              <div class="post-title">
-                  <h2>${ title }</h2>
-                  <span>${ update }</span>
-              </div>
-              <div class="post-summary">
-                  <p>${ summary }</p>
-              </div>
-              <div class="post-footer">
-                  <span>${ creat }</span>
-              </div>
+        
+        <div class="post-item">
+            <div class="post-title">
+                <h2><a v-bind:href="url">${ title }</a></h2>
+                <span>${ update }</span>
             </div>
-        </a>
+            <div class="post-summary">
+                <p><a v-bind:href="url">${ summary }</a></p>
+            </div>
+            <div class="post-footer">
+                <span>${ creat }</span>
+            </div>
+            <div class="post-option">
+                <div class="post-option-left">
+
+                </div>
+                <div class="post-option-right">
+                    <div class="button-item">
+                        <div class="button del">
+                            <i class="del-post fa fa-trash-o" v-bind:post_id="id"></i>
+                        </div>
+                    </div>
+                    <div class="button-item">
+                        <div class="button move">
+                            <i class="move-post fa fa-folder-o" v-bind:post_id="id" v-bind:class_id="cid"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
     </div>
 </div>
 
@@ -28,6 +52,245 @@
 <script type="text/javascript">
 
     window.onload = function () {
+
+        $("body").on("touchstart", ".post-item", function (_evt) {
+
+            
+
+            var opt = $(this).find(".post-option");
+
+            var touch;
+
+            if (window.navigator.msPointerEnabled) {
+                touch = _evt;
+            } else {
+                touch = _evt.originalEvent.touches[0];
+            }
+
+            PreCorrds = touchCoords(touch);
+            TouchItem = $(this);
+            PostItemTouch = true;
+            PreOptRight = parseFloat(opt.css("right"));
+
+            if (typeof (PrePostItemOptedTouch) != 'undefined' && !TouchItem.is(PrePostItemOptedTouch)) {
+
+                
+
+                var opt = PrePostItemOptedTouch.find(".post-option");
+                var optright = parseInt(opt.css("right"));
+                var optwidth = opt.width();
+
+                if (optright > -optwidth) {
+                    opt.animate({ right: -optwidth }, 300);
+                }
+
+            }
+
+            
+        });
+
+        $("body").on("touchmove", ".post-item", function (_evt) {
+
+            var touch;
+
+            if (window.navigator.msPointerEnabled) {
+                touch = _evt;
+            } else {
+                touch = _evt.originalEvent.touches[0];
+            }
+
+            var nowcorrds = touchCoords(touch);
+
+            if (typeof (PostItemTouch) != 'undefined' && PostItemTouch) {
+
+                if (nowcorrds) {
+
+                    var horizontalchange = Math.abs(nowcorrds.x - PreCorrds.x);
+                    var verticalchange = Math.abs(nowcorrds.y - PreCorrds.y);
+
+
+                    var opt = TouchItem.find(".post-option");
+                    var optwidth = opt.width();
+                    var optright = parseFloat(opt.css("right"));
+                    var mvx = 0;
+
+                    //if (typeof (PostItemTouching) == 'undefined' && !PostItemTouching) {
+                    if ((optright == 0 || optright == -optwidth) && typeof (PostItemTouching) != 'undefined' && !PostItemTouching) {
+                        if (verticalchange > 4) {
+                            PostItemTouch = false;
+                            PostItemTouching = false;
+
+                            return false;
+                        }
+                    }
+
+                    PostItemTouching = true;
+
+
+                    if (PreOptRight == 0) {
+                        mvx = PreCorrds.x - nowcorrds.x;
+                    }
+                    else {
+                        mvx = -optwidth - (nowcorrds.x - PreCorrds.x);
+                    }
+
+                    if (mvx <= 0 && mvx >= -1 * optwidth) {
+
+                        opt.css("right", mvx);
+                    }
+                    else if (mvx > 0) {
+                        opt.css("right", 0);
+                    }
+                    else if (mvx < -1 * optwidth) {
+                        opt.css("right", -1 * optwidth);
+                    }
+
+                    if (nowcorrds.x > PreCorrds.x) {
+                        TouchDirect = "right";
+                    }
+                    else if (nowcorrds.x < PreCorrds.x) {
+                        TouchDirect = "left";
+                    }
+
+                    _evt.preventDefault();
+                    //return false;
+                }
+            }
+
+
+        });
+
+        $("body").on("touchend", ".post-item", function (_evt) {
+
+            
+            if (typeof (PostItemTouch) != 'undefined' && PostItemTouch) {
+
+                var opt = TouchItem.find(".post-option");
+                var optwidth = opt.width();
+
+
+                if (typeof (TouchDirect) != 'undefined') {
+
+                    if (TouchDirect == "left") {
+
+                        PrePostItemOptedTouch = TouchItem;
+                        opt.css("right", 0);
+                        
+                    }
+                    else {
+                        opt.css("right", -1 * optwidth);
+                    }
+                }
+
+                PostItemTouching = false;
+                PostItemTouch = false;
+                
+
+            }
+
+
+        });
+
+        $("body").bind('touchmove', function (_evt) {
+
+            if (typeof (PostItemTouching) == 'undefined' || !PostItemTouching) {
+
+                if (typeof (PrePostItemOptedTouch) != 'undefined') {
+
+                    var opt = PrePostItemOptedTouch.find(".post-option");
+                    var optright = parseInt(opt.css("right"));
+                    var optwidth = opt.width();
+
+
+                    if (optright <= 0 && optright > -optwidth) {
+
+                        opt.css("right", optright - 4);
+                    }
+                }
+
+
+
+            }
+        });
+
+
+        $("#posts").bind('touchmove', function (_evt) {
+            if (typeof (PostItemTouching) != 'undefined' && PostItemTouching) {
+                _evt.preventDefault();
+                //return false
+            }
+
+        });
+
+        $("#posts").bind('touchend', function (_evt) {
+
+            if (typeof (PostItemTouching) == 'undefined' || !PostItemTouching) {
+                if (typeof (PrePostItemOptedTouch) != 'undefined') {
+
+                    var opt = PrePostItemOptedTouch.find(".post-option");
+                    var optright = parseInt(opt.css("right"));
+                    var optwidth = opt.width();
+
+                    if (optright > -optwidth) {
+                        opt.animate({ right: -optwidth }, 600);
+                    }
+                }
+            }
+            
+            
+
+
+        });
+
+
+        $("body").on("mouseenter", ".post-item", function (_evt) {
+
+            if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
+                var obj = $(this);
+                var opt = obj.find(".post-option");
+
+                opt.css("right", 0);
+            }
+            
+        });
+
+        $("body").on("mouseleave", ".post-item", function (_evt) {
+
+            if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
+                var obj = $(this);
+                var opt = obj.find(".post-option");
+
+
+                opt.css("right", -1 * opt.width());
+            }
+        });
+
+        $("body").on("click", ".del-post", function (_evt) {
+            msgpostdel($(this));
+            
+            return false;
+        });
+
+        $("body").on("touchstart", ".del-post", function (_evt) {
+            msgpostdel($(this));
+            
+            return false;
+        });
+
+        $("body").on("click", ".move-post", function (_evt) {
+        
+            showpostmoveview($(this))
+
+            return false;
+            
+        });
+
+        $("body").on("touchstart", ".move-post", function (_evt) {
+            
+            showpostmoveview($(this))
+
+            return false;
+        });
 
         $(window).scroll(function () {
             var scrolltop = $(this).scrollTop();
@@ -41,17 +304,52 @@
         
         getpost();
     };
+    
+    function msgpostdel (_obj) {
+    
+        var obj = _obj;
+        
+        if (confirm('确定要删除本笔记么,删除后将不可恢复!') == true) {
+            deletepost(obj.attr("post_id"));
+        }
+    }
+    
+    function showpostmoveview (_obj) {
+        var obj = _obj;
+        var optid = obj.attr('post_id');
+        var cid = obj.attr('class_id');
+        window.location.href = "/user/moveclass/" + cid + "/post/" + optid;
+        
+    }
+
+    function touchCoords(touch) {
+
+        if (touch.pageX || touch.pageY) {
+            return { x: touch.pageX, y: touch.pageY };
+        }
+        else {
+
+            return {
+                x: touch.clientX + document.body.scrollLeft - document.body.clientLeft,
+                y: touch.clientY + document.body.scrollTop - document.body.clientTop
+            };
+        }
+    }
 
 
 
 
     function getpost() {
 
-        if (typeof(nexturi) == 'undefined') {
-            nexturi = '/user/postlistjson/1'
+        if (typeof(NextUri) == 'undefined') {
+            NextUri = '/user/postlistjson/1'
+        }
+        
+        if ($('#classid').length > 0) {
+            NextUri += "/" + $('#classid').val();
         }
 
-        if (nexturi == null) {
+        if (NextUri == null) {
             return;
         }
 
@@ -59,7 +357,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: nexturi,
+                url: NextUri,
                 beforeSend: function () {
                     issubmit = true;
                 },
@@ -67,10 +365,10 @@
 
                     if (result) {
                         if (result.hasnext) {
-                            nexturi = result.nexturi;
+                            NextUri = result.NextUri;
                         }
                         else {
-                            nexturi = null;
+                            NextUri = null;
                         }
 
                         var template_html = $('#template').html();
@@ -80,6 +378,8 @@
                             new Vue({
                                 el: '#template',
                                 data: {
+                                    id: result.posts[i].id,
+                                    cid: result.posts[i].cid,
                                     url: result.posts[i].url,
                                     title: result.posts[i].title,
                                     update: moment(result.posts[i].update).fromNow(),
@@ -97,6 +397,39 @@
                     issubmit = false;
 
 
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+
+    function deletepost(_postid) {
+        if (typeof (issubmit) == 'undefined' || !issubmit) {
+
+            var geturl = '/user/del/';
+            geturl += _postid
+
+            $.ajax({
+                type: 'GET',
+                url: geturl,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    if (result) {
+                        if (result.code == 200) {
+                            window.location.href = result.nexturl;
+                        }
+                        else {
+                            alert('删除失败')
+                        }
+                    }
+
+                    issubmit = false;
                 },
                 error: function (er) {
                     console.log(er)
