@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="format-detection" content="telephone=no">
+
+		<title>hljs --test</title>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		
+	</head>
+	<body>
+        <div>
+            <input id="fileselect" accept="*" type="file">
+        </div>
+        <br/>
+        <br/>
+        <div>
+            <input id="fileselect_1" accept="*" type="file">
+        </div>
+        <br/>
+        <br/>
+		<div id="filelink">
+			
+		</div>	
+        <br/>
+        <br/>
+        <div id="fileimg">
+			
+		</div>	
+		
+	</body>
+    
+</html>
+
+<script type="text/javascript">
+
+    window.onload = function () {
+    
+       
+    
+        $('#fileselect').bind('change', function () {
+            //var obj = document.getElementById('file-img-upload');
+            
+            var obj = this;
+          
+            if (obj.files) {
+
+                for (var i = 0; i < obj.files.length; i++) {
+
+                    var fr = new FileReader();
+
+                    fr.onload = (function (file, evt) {
+
+                        return function (evt) {
+
+                            base64Code = this.result;
+                            var atag = "<a class='downloadlink' href='" + base64Code + "'>" + file.name + "</a><br/>"
+                            var imgtag = "<img src='" + base64Code +"' alt='" + file.name + "'/><br/>"
+                            
+                            $('#filelink').append(atag)
+                            
+                            if (file.type.indexOf('image') > -1) {
+                                $('#fileimg').append(imgtag)
+                            }
+                            console.log(file)
+                        }
+
+                    })(obj.files[i]);
+
+                    fr.readAsDataURL(obj.files[i])
+                }
+
+            }
+
+        });
+        
+         $('#fileselect_1').bind('change', function () {
+            //var obj = document.getElementById('file-img-upload');
+            
+            var obj = this;
+          
+            if (obj.files) {
+
+                for (var i = 0; i < obj.files.length; i++) {
+
+                    var fr = new FileReader();
+
+                    fr.onload = (function (file, evt) {
+
+                        return function (evt) {
+
+                            var blob = new Blob([this.result], {type : file.type});
+                            
+                            
+                            var img = new Image();
+                            
+                            img.onload = function () {
+                                $("#fileimg")[0].appendChild(img);
+                            }
+                            
+                            img.src = URL.createObjectURL(blob);
+                            
+                            
+                            
+                            console.log(blob)
+                            console.log(URL.createObjectURL(blob))
+                            console.log(file)
+                        }
+
+                    })(obj.files[i]);
+
+                    fr.readAsArrayBuffer(obj.files[i])
+                }
+
+            }
+
+        });
+        
+        $("body").on("click", ".downloadlink", function (_evt) {
+            var hreftype = this.href.indexOf('base64') > -1 ? 'base64' : 'blob';
+            
+            if (hreftype == 'base64') {
+            
+                var obj = $(this)
+                var filename = obj.html();
+                var fileblob = getBlbo(this.href);
+                
+                /*
+                if (navigator.msSaveBlob) {
+                
+                    navigator.msSaveBlob(fileblob, filename);
+                }
+                else {
+                
+                    this.download = filename;
+                    this.href = URL.createObjectURL(fileblob);
+                }
+                */
+                
+                this.download = filename;
+                this.href = URL.createObjectURL(fileblob);
+                
+            }
+        
+            
+
+            
+        });
+        
+        function getMine (_b64c) {
+            var mine = /data:([^;]*);/i.exec(_b64c)[1];
+            
+            return mine;
+        }
+        
+        function getBlbo (_b64c) {
+
+            var format = getMine(_b64c);
+            var base64 = _b64c;
+            var code = window.atob(base64.split(",")[1]);
+            var aBuffer = new window.ArrayBuffer(code.length);
+            var uBuffer = new window.Uint8Array(aBuffer);
+            
+            for(var i = 0; i < code.length; i++){
+                uBuffer[i] = code.charCodeAt(i) & 0xff ;
+            }
+            
+            console.info([aBuffer]);
+            console.info(uBuffer);
+            console.info(uBuffer.buffer);
+            console.info(uBuffer.buffer==aBuffer); //true
+            
+            var blob=null;
+            
+            try{
+                blob = new Blob([uBuffer], {type : format});
+            }
+            catch(e){
+                window.BlobBuilder = window.BlobBuilder ||
+                window.WebKitBlobBuilder ||
+                window.MozBlobBuilder ||
+                window.MSBlobBuilder;
+                if(e.name == 'TypeError' && window.BlobBuilder){
+                    var bb = new window.BlobBuilder();
+                    bb.append(uBuffer.buffer);
+                    blob = bb.getBlob("image/jpeg");
+                }
+                else if(e.name == "InvalidStateError"){
+                    blob = new Blob([aBuffer], {type : format});
+                }
+                else{
+                }
+            }
+            
+            return blob;
+        }
+        
+    };
+    
+</script>

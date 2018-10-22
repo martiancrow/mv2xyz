@@ -1,0 +1,935 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<meta name="format-detection" content="telephone=no">
+
+		<title>mv2 -- edit</title>
+
+        
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/codemirror.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+		<!--<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        
+		<!--<script src="https://cdn.bootcss.com/codemirror/5.38.0/codemirror.min.js"></script>-->
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.19/marked.min.js"></script>
+		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.2.0/iscroll.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/markdown.min.js"></script>
+        
+        
+        
+		
+		<style type="text/css">
+			html, body {height: 100%;font-size:14px;margin:0;}
+            iframe {height: 100%;width: 100%;}
+			.wrapper {width: 100%;height: 100%;top: 0;background-color: #ddd;float: left;}
+			
+
+		</style>
+	</head>
+	<body>
+		<div class="wrapper">
+			<iframe src="http://192.168.1.105:5000" width="100%" height="100%" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="yes" allowtransparency="yes"></iframe>
+		</div>	
+        <script type="text/javascript">
+        
+            function utilTools () {
+            
+                var outs = new Object;
+            
+                outs.checkDriver = function () {
+                
+                    var ua = navigator.userAgent; 
+                    var app = navigator.appVersion;
+                    
+                    
+                    if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                        if (ua.indexOf('iPhone') > -1) {
+                            
+                            if (ua.indexOf('MQQBrowser') > -1) {
+                            
+                                return 'ios_iphone_mqq';
+                            }
+                            else if (navigator.standalone) {
+                            
+                                return 'ios_iphone_safari_webapp';
+                            }
+                        
+                            return 'ios_iphone_safari';
+                        }
+                        else if (ua.indexOf('iPad') > -1) {
+                        
+                            return 'ios_ipad_safari';
+                        }
+                    
+                        return 'ios';
+                    }
+                    else if (ua.indexOf('Android') > -1 || ua.indexOf('Linux') > -1) {
+                        
+                        return 'android'
+                    }
+                    
+                    return  'other';
+
+                };
+                
+                return outs;
+            }
+        
+        </script>
+        
+        <script type="text/javascript">
+        
+            function scrollHelper (_edit) {
+            
+                this._init_ = function () {
+                    this._edit = _edit;
+                    this._drvtype = utilTools().checkDriver();
+                    
+                    if (this._drvtype.indexOf('ios')  > -1) {
+                        $("#md-wrapper").css("overflow-y", "hidden");
+                        
+                        this._htmlScroll = new IScroll('#md-wrapper', {
+                            preventDefault: true,
+                            preventDefaultException: {
+                                tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|A|PRE|CODE)$/
+                            },
+                            disableMouse: true,
+                            disablePointer: true,
+                            scrollbars: true,
+                            hScrollbar: false,  
+                            vScroll: true,      
+                            bounce: true,      
+                            tap: "htmlscrolltap",
+                            mouseWheel: true,
+                            fadeScrollbars: true,
+                            scrollbars: true
+                        });
+                   
+                        this._editScroll = new IScroll('.content', {
+                            preventDefault: false,
+                            disableMouse: true,
+                            disablePointer: true,
+                            hScrollbar: false,  
+                            vScroll: true,      
+                            bounce: true,      
+                            click: true,    　     //有bug,true的时候checkbox 不能点击,false的时候超链接不能点击
+                            mouseWheel: true,
+                            fadeScrollbars: true,
+                            scrollbars: true
+                        });
+
+                    }
+
+                }
+                
+                this.refReshHtml = function () {
+                    if (this._drvtype.indexOf('ios')  > -1) {
+                        setTimeout(function () {
+                            this._htmlScroll.refresh();
+                        }.bind(this), 0);
+                    }
+                };
+                
+                this.refReshEdit = function () {
+                    if (this._drvtype.indexOf('ios')  > -1) {
+                        setTimeout(function () {
+                            this._editScroll.refresh();
+                        }.bind(this), 0);
+                    }
+                };
+                
+                this._init_();
+            }
+            
+        </script>
+        
+        <script type="text/javascript">
+        
+            function screenHelper (_edit, _scroll) {
+            
+                this._init_ = function () {
+                    this._edit = _edit;
+                    this._scroll = _scroll;
+                    this._isPreven = false;
+                    this._keyoutcontentHeight = 0;
+                    this._keyHeight = 0;
+                    
+                    this._additiveHeight = 0;
+                    
+                    this._firstOpenKey = true;
+                    this._orientationMsg = false;
+                    this._autoScrollHideInputCanChange = true;
+                    
+                    this._drvtype = utilTools().checkDriver();
+                    this._onlLoadHeight();
+                    this.setSize();
+                    this._prevenMove();
+                    this._checkAdditiveHeight();
+                    
+                    
+                    
+                    if (this._drvtype.indexOf('ios')  > -1) {
+                    
+                        //console.log("navigator.userAgent:" + navigator.userAgent)
+                        //console.log("navigator.appVersion:" + navigator.appVersion)
+                        
+                        //alert(navigator.userAgent)
+                        
+                        /*
+                        setInterval(function () {
+                            console.log("window.innerHeight:" + window.innerHeight)
+                            console.log("document.documentElement.clientHeight:" + document.documentElement.clientHeight)
+                            console.log("bodyScrollTop:" + $("body").scrollTop())
+                            console.log("bodyHeight:" + $("body").height())
+                            
+                        }, 1000);
+                        */
+                    
+                        $(window).scroll(function(event) {
+                            this._heightLoop();
+                            if (!this._firstOpenKey) {
+                                setTimeout(function () {
+                                    if ($('body').scrollTop() != 0) {
+                                        $('body').scrollTop(0)
+                                    }
+                                }.bind(this), 100);
+                            }
+                            
+                        }.bind(this));
+                        
+                        $("#hide_input").bind('focus', function () {
+                            if (this._firstOpenKey) {
+                                this.onKeyChange("open");
+                                $("#title").focus();
+                            }
+                        }.bind(this))
+                        
+                        $("#hide_input").bind('blur', function () {
+
+                            if (!this._firstOpenKey) {
+                            
+                                this.onKeyChange("close");
+                            }
+                        }.bind(this));
+
+                        this._edit.on('focus', function () {
+                            this.onKeyChange("open");
+                        }.bind(this));
+                        
+                        this._edit.on('blur', function () {
+                            this.onKeyChange("close");
+                        }.bind(this));
+                        
+                        $("#title").bind('focus', function () {
+                            if ($("#title").attr("readonly")) {
+                                $("#title").blur();
+                                return false;
+                            }
+                        
+                            if (this._firstOpenKey) {
+                                this._firstOpenKey = false;
+                            }
+                            else {
+                                this.onKeyChange("open");
+                            }
+                        }.bind(this));
+                        
+                        $("#title").bind('blur', function () {
+                            this.onKeyChange("close");
+                        }.bind(this));
+                        
+                        $(".content").bind('touchstart', function () {
+                            if (this._edit.doc.height < $('.content').height()) {
+                                this._edit.focus();
+                                return false;
+                            }
+                        }.bind(this));
+                        
+                        this._scroll._editScroll.on('scrollEnd', function () {
+                        
+                            if (this._edit.hasFocus() || $('#hide_input').is(":focus")) {
+                            
+                                this.autoScroll('scrollend');
+                            }
+                        }.bind(this));
+                        
+                       
+                        
+                        $("#hide_input").bind('input', function () {
+                        
+                            setTimeout(function () {
+                                this.autoScroll('hide_input_oninput');
+                            }.bind(this), 0);
+                        }.bind(this)).on('compositionstart', function () {
+
+                            this._autoScrollHideInputCanChange = false;
+                        }.bind(this)).on('compositionend', function () {
+
+                            this._autoScrollHideInputCanChange = true;
+                        }.bind(this));
+
+                        this._onlLoadHeight();
+                        this._scroll.refReshHtml();
+                        this._scroll.refReshEdit();
+
+                    }
+                    else {
+                        window.onresize = function () {
+                            this.setSize();
+
+                        }.bind(this);
+                    }
+                    
+                    window.onorientationchange = function () {
+                        this.setSize();
+                        this._hideKey();
+                        
+                        this.ListenOrientation();
+                                                
+                    }.bind(this);
+                    
+
+                };
+                
+                this._onlLoadHeight = function () {
+                    this._loadcontentHeight = $('.content').height();
+                    this._loadinnerHeight = window.innerHeight;
+                };
+
+                this._checkAdditiveHeight = function () {
+                    
+                    if (this._drvtype == 'ios_iphone_safari') { 
+                        this._additiveHeight = 45;
+                    }
+                };
+                
+                this._prevenMove = function () {
+                    
+                    if (this._drvtype.indexOf('ios')  > -1) {
+                    
+                        $('html').bind('touchmove', function (e) {
+                            if ($('.preview').is(':hidden')) {
+                                e.preventDefault();
+                            }
+                        }.bind(this));
+                    
+                        $('body').bind('touchmove', function (e) {
+                            if ($('.preview').is(':hidden')) {
+                                e.preventDefault();
+                            }
+                        }.bind(this));
+                        
+                        $('.warpper').bind('touchmove', function (e) {
+                            if ($('.preview').is(':hidden')) {
+                                e.preventDefault();
+                            }
+                        }.bind(this));
+                        
+                        $('.head').bind('touchmove', function (e) {
+                            e.preventDefault();
+                        }.bind(this));
+                    
+                        $('.title').bind('touchmove', function (e) {
+                            e.preventDefault();
+                        }.bind(this));
+                        
+                        $('.content').bind('touchmove', function (e) {
+                            e.preventDefault();
+                        }.bind(this));
+                        
+                        $('.foot').bind('touchmove', function (e) {
+                            e.preventDefault();
+                        }.bind(this));
+                        
+                        $('#md-wrapper').bind('touchmove', function (e) {
+                            //e.preventDefault();
+                        }.bind(this));
+                    
+                    }
+                };
+                
+                this._openKey = function () {
+
+                    if ($('.content').height() > this._keyoutcontentHeight) {
+                    
+                        if (this._firstOpenKey) {
+                            
+                            $("body").scrollTop(this._loadinnerHeight);
+                            setTimeout(function () {
+                                
+                                if (this._drvtype.indexOf('iphone') > -1) {
+                                    
+                                }
+                                
+                                $("#foot")[0].scrollIntoView();
+
+                                setTimeout(function () {
+                                    this._setcontentHeight();
+                                    //this.autoScroll("focus");
+                                }.bind(this), 100);
+                                
+                            }.bind(this), 700);
+                        }
+                        else {
+
+                            this._setcontentHeight();
+                            //this.autoScroll("focus");
+                        }
+                    }
+                };
+                
+                this._closeKey = function () {
+                    var tbxTitle = $("#title")[0];
+                    var tbxContent = $(".content")[0];
+                    
+                    var titleFocus = (document.activeElement == tbxTitle);
+                    var contentFocus = this._edit.hasFocus();
+                    
+                    if (!titleFocus && !contentFocus) {
+                        if (!this._isPreven) {
+                            if ($('.content').height() <= this._keyoutcontentHeight) {
+                                this._setcontentHeight();
+                            }
+                        }
+                    }
+                    
+                    this.acceptChange();
+                };
+                
+                this._hideKey = function () {
+                    this.acceptChange();
+                    document.activeElement.blur();
+                }
+
+                this._setcontentHeight = function () {
+                
+                    if (!this._keyoutcontentHeight || !this._loadcontentHeight) {
+                        return;
+                    }
+                
+                    if ($('.content').height() > this._keyoutcontentHeight) {
+                        $('.content').height(this._keyoutcontentHeight);
+                    }
+                    else
+                    {
+                        $('.content').height(this._loadcontentHeight);
+                    }
+                    
+                    $('body').scrollTop(0);
+                    
+                    this._scroll.refReshEdit();
+
+                };
+                
+                this._heightLoop = function () {
+                
+                    //prevent scrollIntoView scroll too more
+                    var temkoch = this._loadcontentHeight - $('body').scrollTop() + this._additiveHeight;
+
+                    if (temkoch > 0 && $('body').scrollTop() > this._keyHeight && window.innerHeight != this._loadinnerHeight) {
+                        this._keyHeight = $('body').scrollTop();                    
+                        this._keyoutcontentHeight = this._loadcontentHeight - this._keyHeight + this._additiveHeight;
+                        
+                    }
+                    
+                    
+                };
+                
+                this.autoScroll = function (_type) {
+                    
+                    if (this._drvtype.indexOf('ios') > -1) {
+                    
+
+                        var cursor = this._edit.getCursor();
+                        
+                        var focusHeight = 0;
+
+                        for (var i = 0; i <= cursor.line; i++) {
+                            focusHeight += this._edit.display.view[i].line.height;
+                        }
+                                                
+                        var scrollHeight = Math.abs(this._scroll._editScroll.y);
+                        var viewportHeight = $(".content").height();
+                        
+                        var unvpsc = function () {
+                        
+                            var autoScrollheight = focusHeight - viewportHeight + this._edit.display.cachedTextHeight;
+                            autoScrollheight = autoScrollheight * -1;
+                            autoScrollheight = autoScrollheight < this._scroll._editScroll.maxScrollY ? this._scroll._editScroll.maxScrollY : autoScrollheight;
+                            this._scroll._editScroll.scrollTo(0, autoScrollheight, 0);
+                            this._edit.replaceSelection(' ');
+                            this._edit.replaceRange('', {line: cursor.line, ch: cursor.ch}, {line: cursor.line, ch: cursor.ch + 1});
+                        }.bind(this);
+                        
+                        var upvpsc = function () {
+                        
+                            var autoScrollheight = focusHeight - this._edit.display.cachedTextHeight;
+                            autoScrollheight = autoScrollheight * -1;
+                            autoScrollheight = autoScrollheight > 0 ? 0 : autoScrollheight;
+                            this._scroll._editScroll.scrollTo(0, autoScrollheight, 0);
+                            this._edit.replaceSelection(' ');
+                            this._edit.replaceRange('', {line: cursor.line, ch: cursor.ch}, {line: cursor.line, ch: cursor.ch + 1});
+                        }.bind(this);
+                        
+                        //console.log("cursor.line:" + cursor.line)
+                        //console.log("focusHeight:" + focusHeight)
+                        //console.log("scrollHeight:" + scrollHeight)
+                        //console.log("viewportHeight:" + viewportHeight)
+                        
+                        
+                        
+                        if (scrollHeight + viewportHeight <= focusHeight) {
+                            //under the viewport
+                            
+                            //$(".CodeMirror").hide()
+                            
+                            //setTimeout(function () {
+                            //    $(".CodeMirror").show()
+                            //}, 0)
+
+                            //注意解决iosweb本生的焦点对齐事件
+                            //autoScrollheight = autoScrollheight > 0 ? autoScrollheight * -1 : 0;
+                            
+                            
+                            
+                            if (_type == "scrollend") {
+                            
+                                sch.preventChange();
+                                $("#hide_input").val('');
+                                $("#hide_input").focus();
+                            }
+                            else if (_type == "hide_input_oninput") {
+                            
+                                if (this._autoScrollHideInputCanChange) {
+                                
+                                    unvpsc();
+                                }
+                            }
+                            else {
+
+                                unvpsc();
+                            }
+                            
+                          
+                            //console.log("autoScrollheight:" + autoScrollheight)
+                            //console.log("maxScrollY:" + this._scroll._editScroll.maxScrollY)
+                            
+                            //this._scroll.refReshEdit();
+                        }
+                        else if (scrollHeight >= focusHeight) {
+                            //upper the viewport
+                            
+                            if (_type == "scrollend") {
+                            
+                                sch.preventChange();
+                                $("#hide_input").val('');
+                                $("#hide_input").focus();
+                            }
+                            else if (_type == "hide_input_oninput") {
+                            
+                                if (this._autoScrollHideInputCanChange) {
+                                
+                                    upvpsc();
+                                }
+                            }
+                            else {
+
+                                upvpsc();
+                            }
+                        
+                            
+                        }
+                        else {
+                        
+                            //in the viewport
+                            if (_type == "scrollend") {
+                            
+                                if (!this._edit.hasFocus()) {
+                                    this._edit.setCursor(cursor.line, cursor.ch);
+                                    this._edit.focus();
+                                }
+                            }
+                        }
+                        
+                        
+                        if (_type == "hide_input_oninput") {
+                                                    
+                            if (!this._edit.hasFocus() && this._autoScrollHideInputCanChange) {
+                                var content = $("#hide_input").val();
+                                $("#hide_input").val('');
+                                
+                                this._edit.setCursor(cursor.line, cursor.ch);
+                                this._edit.replaceSelection(content);
+                                this._edit.setCursor(cursor.line, cursor.ch + content.length);
+                                this._edit.focus();
+                            }
+                        }
+                        
+
+                        
+                        
+                       
+                        
+                    
+                    }
+                    
+                };
+                
+                this.setSize = function () {
+
+                    var initfootheight = $('#foot').height() + 1; //broadheight
+                    
+                    var viewHeight = $('.warpper').height();
+                    var content_height = viewHeight - ($('.title').height() + 1) - $('.head').height() - initfootheight;
+                    $('.content').height(content_height);
+                    
+                    if (this._drvtype.indexOf('ios')  > -1) {
+                        this._edit.setSize('auto', 'auto');
+                    }
+                    else {
+                        this._edit.setSize('auto', content_height + 'px');
+                    }
+
+                    var md_wrapper_height = $('.preview').height() - ($('.preview-foot').height() + 1);
+                    $('#md-wrapper').height(md_wrapper_height);
+
+                    var foot_tools_wrapper_width = 0;
+
+                    for (var i = 0; i < $('.tools-left-warpper i').length; i++) {
+                        foot_tools_wrapper_width += $($('.tools-left-warpper i')[i]).width() + 25 + 1; //span spaces
+                    }
+
+                    $('.tools-left-warpper').width(foot_tools_wrapper_width);
+                };
+                
+                this.ListenOrientation = function () {
+                    
+                    if (this._drvtype.indexOf('ios') > -1 || true) {
+                    
+                        if (window.orientation == 90 || window.orientation == -90) {
+                        
+                            this._edit.setOption("readOnly", "nocursor");
+                            $('#title').attr("readonly", "readonly");
+                        
+                            if ($('.preview').is(':hidden')) {
+                                if (!this._orientationMsg) {
+                                    alert("为了您获得最佳的用户体验,请在竖屏下进行编辑");
+                                    this._orientationMsg = true;
+                                }
+                            }
+                            
+                            $('.preview').show();
+                        }
+                        else {
+                        
+                            this._edit.setOption("readOnly", false);
+                            $('#title').removeAttr("readonly");
+                            
+                        }
+                    }
+                };
+                
+                this.preventChange = function () {
+                    this._isPreven = true;
+                };
+                
+                this.acceptChange = function () {
+                    this._isPreven = false;
+                };
+                
+                this.onKeyChange = function (_type) {
+
+                    if (_type == "open") {
+                        this._openKey();
+                    }
+                    else {
+                        setTimeout(this._closeKey.bind(this), 100);
+                    }
+
+                };
+                
+                this.autoOpenIosKey = function () {
+                
+                    if (window.orientation != 90 && window.orientation != -90) {
+                    
+                        $("#hide_input").focus();
+                    }
+                }
+                
+                this._init_();
+                
+            
+            }
+
+        </script>
+        
+        <script type="text/javascript">
+   
+            function LocalDB () {
+                this.dbname = "mv2xyz";
+                this.dbver = 1;
+                
+                this._init_ = function () {
+                
+                    var request = indexedDB.open(this.dbname, this.dbver);
+                    
+                    request.onerror = function (event) {
+                        console.log("open fail:" + event.target.message);
+                    }.bind(this);
+                    
+                    request.onsuccess = function (event) {
+                        this.database = event.target.result;
+                        
+                        if (this.onload) {
+                            this.onload()
+                        }
+                        
+                       
+                    }.bind(this);
+                    
+                    request.onupgradeneeded = function(event) {
+                                    
+                        this.database = event.target.result;
+                        var objectstore = this.database.createObjectStore("content", { keyPath: "datakey" });
+
+                    }.bind(this);
+                    
+                    
+                    
+                };
+                
+                this.set = function (_datakey, _datavalue) {
+                
+                    var data = {
+                    
+                        datakey : _datakey,
+                        dataval : _datavalue
+                        
+                    }
+                                
+                    if (!this.database) {
+                        
+                        return false;
+                        
+                    }
+                    
+                    var transaction = this.database.transaction("content", "readwrite");
+                    var objectStore = transaction.objectStore("content");
+                    
+                    var getres = objectStore.get(_datakey);
+                    
+                    getres.onsuccess = function (e) {
+                    
+                        objectStore.put(data);
+                        
+                    };
+                    
+                    return true;
+                    
+                };
+                
+                this.del = function (_datakey) {
+                
+                    if (!this.database) {
+                    
+                        return false;
+                        
+                    }
+                
+                    var transaction = this.database.transaction("content", "readwrite");
+                    var objectStore = transaction.objectStore("content");
+                    objectStore.delete(_datakey);
+                    
+                    return true;
+                }
+                
+               
+                this.get = function (_datakey, _cb) {
+
+                    if (!this.database) {
+                        
+                        return false;
+                        
+                    }
+                                
+                    var transaction = this.database.transaction("content", "readwrite");
+                    var objectStore = transaction.objectStore("content");
+                    
+                    var request = objectStore.get(_datakey);
+
+                    
+                    
+                    request.onsuccess = function (e) {
+                        var result = e.target.result;
+
+                        
+                        
+                        if (_cb) {
+                        
+                            if (result) {
+                                _cb(result.dataval);
+                            }
+                            else {
+                                _cb(result);
+                            }
+                            
+                        }
+                    }
+                    
+                    request.onerror = function (e) {
+                        console.log(e)
+                    };
+                    
+                    return true;
+
+                }
+                
+                this._init_();
+
+            }
+        </script>
+        
+        <script type="text/javascript">
+   
+            function DocCache(_edit) {
+
+                this._init_ = function () {
+                    this._edit = _edit;
+                    this.db = new LocalDB();
+
+                    this.db.onload = function () {
+
+                        var postid = $("#postid").val();
+                        var datakey = "cache_new";
+
+                        if (postid) {
+                        
+                            datakey = "cache_" + postid;
+                        }
+                                                
+                        var res = this.db.get(datakey, function (_val) {
+                        
+                            if (_val) {
+                            
+                                var content = $("#mv2_input").val();
+                                var updatetime = 0;
+                                
+                                if ($("#updatetime").length > 0) {
+                                
+                                    updatetime = Date.parse(new Date($("#updatetime").val()));
+                                }
+
+                                var localupdatetime = _val.updatetime;
+
+                                if (localupdatetime > updatetime) {
+                                    if (confirm("监测到您上次未保存就退出,是否继续上次内容编辑")) {
+                                        content = _val.content;
+                                        updatetime = localupdatetime;
+                                        
+                                        this._edit.setValue(content);
+                                    }
+                                }
+
+                                var data = {
+                                    updatetime: updatetime,
+                                    content: content
+                                };
+
+                                this.db.set(datakey, data);
+                            }
+                            else {
+
+                                var content = $("#mv2_input").val();
+                                var updatetime = 0;
+                                
+                                if ($("#updatetime").length > 0) {
+                                
+                                    updatetime = Date.parse(new Date($("#updatetime").val()));
+                                }
+
+                                var data = {
+                                    updatetime: updatetime,
+                                    content: content
+                                };
+                                
+                                
+
+                                this.db.set(datakey, data);
+                            }
+                        }.bind(this));
+                        
+                    }.bind(this);
+                    
+                };
+                
+                this.cache = function (_mdcode) {
+                    var postid = $("#postid").val();
+                    var datakey = "cache_new";
+                        
+                    if (postid) {
+                    
+                        datakey = "cache_" + postid;
+                    }
+                    
+                    var content = _mdcode;
+                    var updatetime = Date.parse(new Date());
+                    
+                    var data = {
+                        updatetime : updatetime,
+                        content : content
+                    };
+                            
+                    this.db.set(datakey, data);
+                    
+                };
+                
+                this.clean = function () {
+
+                    var postid = $("#postid").val();
+                    var datakey = "cache_new";
+                        
+                    if (postid) {
+                    
+                        datakey = "cache_" + postid; 
+                    }
+                    
+                    this.db.del(datakey);
+                    
+                };
+                
+                this._init_();
+
+            }
+        </script>
+        
+		<script type="text/javascript">
+		
+			
+
+			window.onload = function () {
+				
+                
+                                
+                
+                
+                
+			};
+
+			
+			
+		</script>
+	</body>
+</html>
