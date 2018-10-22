@@ -12,8 +12,8 @@ div.content-warpper {width: 100%;overflow: hidden;padding-top: 50px;}
 div.login-box {width: 100%;overflow: hidden;}
 
 div.post-list {width: 100%;overflow: hidden;padding-top: 50px;}
-div.post-list a {display: block;}
-div.post-item {width: 100%;overflow: hidden;margin: 10px 0;border-bottom: 1px solid #ddd;}
+div.post-list a {display: block;overflow: hidden;}
+div.post-item {width: 100%;overflow: hidden;margin: 10px 0;border-bottom: 1px solid #ddd;position:relative;}
 div.post-title {width: 100%;height: 20px;overflow: hidden;float: left;line-height: 20px;}
 div.post-title h2 {font-size: 16px;float: left;}
 div.post-title span {font-size: 12px;color: #969696;float: right;}
@@ -22,5 +22,55 @@ div.post-summary p {font-size: 12px;color: #969696}
 div.post-footer {width: 100%;overflow: hidden;float: left;height: 15px;line-height: 15px;margin: 5px 0;}
 div.post-footer span {font-size: 12px;color: #969696;}
 
+.post-option {height:100%;position:absolute;right:calc(-42px * 2);top:0;overflow:hidden;}
+.post-option .post-option-left {height:100%;float:right;overflow:hidden;}
+.post-option .post-option-left .button {width:36px;height:36px;float:right;border-radius:36px;margin:22px auto 22px 6px;text-align:center;line-height:36px;color:#FFF;font-size:24px;}
+.post-option .post-option-right {height:100%;float:right;overflow:hidden;}
+.post-option .post-option-right .button-item {height:100%;width:36px;float:right;overflow:hidden;margin-left:6px;position:relative;}
+.post-option .post-option-right .button {width:36px;height:36px;border-radius:36px;margin-top: -18px;text-align:center;line-height:36px;color:#FFF;font-size:24px;position:absolute;top:50%;}
+.post-option .post-option-right .del {background-color:#d30000;cursor:pointer;}
+.post-option .post-option-right .edit {background-color:#969696;font-size:18px;line-height:38px;}
+.post-option .post-option-right .move {background-color:#969696;line-height:38px;}
+
+.class-global-option {width: 100%;overflow: hidden;margin: 10px 0;position:relative;}
+.class-global-option .class-add {width: 100%;height:50px;overflow: hidden;border: 2px dashed #ddd;position:relative;float:left;border-radius:7px;cursor:pointer;text-align:center;line-height:50px;}
+#class_set_view {width:300px;border: 2px dashed #565656;box-sizing:border-box;position:absolute;top:calc(25% - 50px);left:calc(50% - 150px);border-radius:7px;background-color:#FFF;z-index:99999;overflow:hidden;display:none;}
+#class_set_view .set-name{width:100%;height:56px;float:left;}
+#class_set_view .set-name input[type="text"]{width:90%;height:50px;margin:3px auto;border:0;display:block;line-height:50px;}
+#class_set_view .set-button{width:100%;height:40px;float:left;}
+#class_set_view .set-button .set{width:50%;height:100%;float:left;cursor:pointer;text-align:center;line-height:40px;background-color:#ddd;}
+#class_set_view .set-button .cancel{width:50%;height:100%;float:left;cursor:pointer;text-align:center;line-height:40px;background-color:#808080;}
+
+.class-item {width: 100%;overflow: hidden;margin: 10px 0;border-bottom: 1px solid #ddd;position:relative;}
+.class-name {width: 100%;height: 20px;overflow: hidden;float: left;line-height: 20px;}
+.class-name h2 {font-size: 16px;float: left;}
+.class-summary {width: 100%;margin: 5px auto 0 auto;overflow: hidden;float: left;}
+.class-summary span {font-size: 12px;color: #969696}
+.class-footer {width: 100%;overflow: hidden;float: left;height: 15px;line-height: 15px;margin: 5px 0;}
+.class-footer span {font-size: 12px;color: #969696;}
+
+.class-option {height:100%;position:absolute;right:calc(-42px * 3);top:0;overflow:hidden;}
+.class-option .class-option-left {height:100%;float:right;overflow:hidden;}
+.class-option .class-option-left .button {width:36px;height:36px;float:right;border-radius:36px;margin:22px auto 22px 6px;text-align:center;line-height:36px;color:#FFF;font-size:24px;}
+.class-option .class-option-right {height:100%;float:right;overflow:hidden;}
+.class-option .class-option-right .button-item {height:100%;width:36px;float:right;overflow:hidden;margin-left:6px;position:relative;}
+.class-option .class-option-right .button {width:36px;height:36px;border-radius:36px;margin-top: -18px;text-align:center;line-height:36px;color:#FFF;font-size:24px;position:absolute;top:50%;cursor:pointer;}
+.class-option .class-option-right .del {background-color:#d30000;}
+.class-option .class-option-right .edit {background-color:#969696;}
+.class-option .class-option-right .move {background-color:#969696;line-height:38px;}
+
+.move-class-head {width: 100%;height:50px;overflow: hidden;position:fixed;border-bottom:solid 1px #e7e7e7;font-size:16px;}
+.move-class-head .move-class-head-left {width: 52px;height:50px;overflow: hidden;position:relative;padding-left:15px;float:left;box-sizing:border-box;}
+.move-class-head .move-class-head-left .item {height:50px;line-height:50px;overflow: hidden;position:relative;float:left;}
+.move-class-head .move-class-head-title {width: calc(100% - 52px - 100px);height:100%;overflow: hidden;position:relative;padding-left:14px;float:left;box-sizing:border-box;text-align:center;}
+.move-class-head .move-class-head-title h2 {height:50px;overflow: hidden;position:relative;line-height:50px;font-size:16px;}
+.move-class-head .move-class-head-right {width: 100px;height:100%;overflow: hidden;position:relative;padding-right:15px;float:left;box-sizing:border-box;}
+.move-class-head .move-class-head-right .item {height:50px;line-height:50px;overflow: hidden;position:relative;padding-left:15px;float:right;}
+
+
+.move-class-global-option {width: 100%;overflow: hidden;margin: 10px 0;position:relative;}
+.move-class-global-option .option-item {width: 49%;height:50px;overflow: hidden;border: 2px dashed #ddd;position:relative;border-radius:7px;cursor:pointer;text-align:center;line-height:50px;}
+.move-class-global-option .class-add {float:left;}
+.move-class-global-option .class-move {float:right;}
 
 

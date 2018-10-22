@@ -44,7 +44,7 @@ def login():
 
             next = request.args.get('next')
             if next is None or not next.startswith('/'):
-                next = url_for('user.index')
+                next = url_for('user.post_list')
 
             return redirect(next)
 

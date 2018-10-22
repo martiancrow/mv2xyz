@@ -8,18 +8,30 @@ import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request, after_this_request
+from sqlalchemy import func
 from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT
 from .. import db, login_manager
 
 class res_postclass(db.Model):
     __tablename__ = 'res_postclasses'
     postclass_id = db.Column(db.Integer, primary_key=True)
+    postclass_pid = db.Column(db.Integer, db.ForeignKey('res_postclasses.postclass_id'), default=0)
     postclass_uid = db.Column(db.Integer, db.ForeignKey('ua_users.ua_user_id'))
     postclass_name = db.Column(db.String(128))
     postclass_createtime = db.Column(db.DateTime(), default=datetime.utcnow)
+    child_classes = db.relationship('res_postclass', lazy='dynamic', cascade="all, delete-orphan")
+    postclass = db.relationship('res_post', backref='postclass', lazy='dynamic', cascade="all, delete-orphan")
 
     def __init__(self, **kwargs):
         super(res_postclass, self).__init__(**kwargs)
+        
+    @property
+    def postcount(self):
+        if self.postclass_id:
+            return db.session.query(func.count(res_post.post_id)).filter_by(post_cid=self.postclass_id).first()[0]
+            #return res_post.query.filter_by(post_cid=self.postclass_id)
+        else:
+            return None
 
     
     def __repr__(self):
@@ -36,7 +48,7 @@ class res_post(db.Model):
     post_body_html = db.Column(LONGTEXT)
     post_updatetime = db.Column(db.DateTime(), default=datetime.utcnow)
     post_createtime = db.Column(db.DateTime(), default=datetime.utcnow)
-    chilposts = db.relationship('res_post', lazy='dynamic', cascade="all, delete-orphan")
+    parentpost = db.relationship('res_post', lazy='dynamic', cascade="all, delete-orphan")
 
     def __init__(self, **kwargs):
         super(res_post, self).__init__(**kwargs)

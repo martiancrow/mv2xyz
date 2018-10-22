@@ -32,6 +32,7 @@ class ua_user(db.Model):
     ua_createtime = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
     posts = db.relationship('res_post', backref='author', lazy='dynamic', cascade="all, delete-orphan")
+    postclass = db.relationship('res_postclass', backref='user', lazy='dynamic', cascade="all, delete-orphan")
 
     def __init__(self, **kwargs):
         super(ua_user, self).__init__(**kwargs)
