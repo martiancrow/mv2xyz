@@ -199,7 +199,9 @@
                         */
                     
                         $(window).scroll(function(event) {
+
                             this._heightLoop();
+                            
                             if (!this._firstOpenKey) {
                                 setTimeout(function () {
                                     if ($('body').scrollTop() != 0) {
@@ -435,17 +437,17 @@
                 };
                 
                 this._heightLoop = function () {
-                
-                    //prevent scrollIntoView scroll too more
-                    var temkoch = this._loadcontentHeight - $('body').scrollTop() + this._additiveHeight;
+                    
+                    if ($('.preview').is(':hidden')) {
+                        //prevent scrollIntoView scroll too more
+                        var temkoch = this._loadcontentHeight - $('body').scrollTop() + this._additiveHeight;
 
-                    if (temkoch > 0 && $('body').scrollTop() > this._keyHeight && window.innerHeight != this._loadinnerHeight) {
-                        this._keyHeight = $('body').scrollTop();                    
-                        this._keyoutcontentHeight = this._loadcontentHeight - this._keyHeight + this._additiveHeight;
-                        
-                    }
-                    
-                    
+                        if (temkoch > 0 && $('body').scrollTop() > this._keyHeight && window.innerHeight != this._loadinnerHeight) {
+                            this._keyHeight = $('body').scrollTop();                    
+                            this._keyoutcontentHeight = this._loadcontentHeight - this._keyHeight + this._additiveHeight;
+                            
+                        }
+                    }                    
                 };
                 
                 this.autoScroll = function (_type) {

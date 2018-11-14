@@ -50,6 +50,57 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/locale/zh-cn.js"></script>
 
 <script type="text/javascript">
+        
+    function utilTools () {
+    
+        var outs = new Object;
+    
+        outs.checkDriver = function () {
+        
+            var ua = navigator.userAgent; 
+            var app = navigator.appVersion;
+            
+            
+            if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                if (ua.indexOf('iPhone') > -1) {
+
+                    if (ua.indexOf('MQQBrowser') > -1) {
+                    
+                        return 'ios_iphone_mqqb';
+                    }
+                    else if (ua.indexOf('MicroMessenger') > -1) {
+                    
+                        return 'ios_iphone_mwxb';
+                    }
+                    else if (navigator.standalone) {
+                    
+                        return 'ios_iphone_safari_webapp';
+                    }
+                
+                    return 'ios_iphone_safari';
+                }
+                else if (ua.indexOf('iPad') > -1) {
+                
+                    return 'ios_ipad_safari';
+                }
+            
+                return 'ios';
+            }
+            else if (ua.indexOf('Android') > -1) {
+                
+                return 'android'
+            }
+            
+            return  'other';
+
+        };
+        
+        return outs;
+    }
+
+</script>
+
+<script type="text/javascript">
 
     window.onload = function () {
 
@@ -116,7 +167,7 @@
 
                     //if (typeof (PostItemTouching) == 'undefined' && !PostItemTouching) {
                     if ((optright == 0 || optright == -optwidth) && typeof (PostItemTouching) != 'undefined' && !PostItemTouching) {
-                        if (verticalchange > 4) {
+                        if (verticalchange > 5) {
                             PostItemTouch = false;
                             PostItemTouching = false;
 
@@ -245,23 +296,31 @@
 
         $("body").on("mouseenter", ".post-item", function (_evt) {
 
-            if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
-                var obj = $(this);
-                var opt = obj.find(".post-option");
+            if (utilTools().checkDriver().indexOf("other") > -1) {
 
-                opt.css("right", 0);
+                if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
+                    var obj = $(this);
+                    var opt = obj.find(".post-option");
+
+                    opt.css("right", 0);
+                }
+
             }
+
             
         });
 
         $("body").on("mouseleave", ".post-item", function (_evt) {
 
-            if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
-                var obj = $(this);
-                var opt = obj.find(".post-option");
+            if (utilTools().checkDriver().indexOf("other") > -1) {
+
+                if (typeof (PostItemTouch) == 'undefined' || !PostItemTouch) {
+                    var obj = $(this);
+                    var opt = obj.find(".post-option");
 
 
-                opt.css("right", -1 * opt.width());
+                    opt.css("right", -1 * opt.width());
+                }
             }
         });
 
@@ -365,7 +424,7 @@
 
                     if (result) {
                         if (result.hasnext) {
-                            NextUri = result.NextUri;
+                            NextUri = result.nexturi;
                         }
                         else {
                             NextUri = null;

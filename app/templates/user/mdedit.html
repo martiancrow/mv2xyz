@@ -46,9 +46,12 @@
             #hide_input {opacity:0;position:absolute;width:0;height:0;top:-500px;}
 
 			.preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;}
-            #md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;position:relative}
-			.markdown-body {width: 100%;overflow: hidden;padding: 18px 21px;box-sizing: border-box;float: left;}
-			.preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}
+            /*#md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;position:relative}*/
+            #md-wrapper {width: 100%;float: left;position:relative}
+			/*.markdown-body {width: 100%;overflow: hidden;padding: 18px 21px;box-sizing: border-box;float: left;}*/
+            .markdown-body {width: 100%;overflow: hidden;padding: 18px 21px 68px 21px;box-sizing: border-box;float: left;}
+			/*.preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}*/
+            .preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;position: fixed;bottom: 0;}
 			.preview-foot i {line-height: 50px;float: left;cursor: pointer;}
 			.preview-foot .tools-left {margin-left: 10px;height: 100%;float: left;overflow: hidden;}
 			.preview-foot .tools-right {margin-right: 10px;height: 100%;float: right;overflow: hidden;}
@@ -223,7 +226,7 @@
                     
                         return 'ios';
                     }
-                    else if (ua.indexOf('Android') > -1 || ua.indexOf('Linux') > -1) {
+                    else if (ua.indexOf('Android') > -1) {
                         
                         return 'android'
                     }
@@ -246,6 +249,8 @@
                     this._drvtype = utilTools().checkDriver();
                     
                     if (this._drvtype.indexOf('ios')  > -1) {
+
+                        /*
                         $("#md-wrapper").css("overflow-y", "hidden");
                         
                         this._htmlScroll = new IScroll('#md-wrapper', {
@@ -264,6 +269,7 @@
                             fadeScrollbars: true,
                             scrollbars: true
                         });
+                        */
                    
                         this._editScroll = new IScroll('.content', {
                             preventDefault: false,
@@ -284,9 +290,11 @@
                 
                 this.refReshHtml = function () {
                     if (this._drvtype.indexOf('ios')  > -1) {
+                        /*
                         setTimeout(function () {
                             this._htmlScroll.refresh();
                         }.bind(this), 0);
+                        */
                     }
                 };
                 
@@ -347,13 +355,18 @@
                         */
                     
                         $(window).scroll(function(event) {
-                            this._heightLoop();
-                            if (!this._firstOpenKey) {
-                                setTimeout(function () {
-                                    if ($('body').scrollTop() != 0) {
-                                        $('body').scrollTop(0)
-                                    }
-                                }.bind(this), 100);
+
+                            if ($('.preview').is(':hidden')) {
+
+                                this._heightLoop();
+
+                                if (!this._firstOpenKey) {
+                                    setTimeout(function () {
+                                        if ($('body').scrollTop() != 0) {
+                                            $('body').scrollTop(0)
+                                        }
+                                    }.bind(this), 100);
+                                }
                             }
                             
                         }.bind(this));
@@ -469,6 +482,8 @@
                     if (this._drvtype == 'ios_iphone_safari') { 
                         this._additiveHeight = 45;
                     }
+
+                    
                 };
                 
                 this._prevenMove = function () {
@@ -509,9 +524,11 @@
                             e.preventDefault();
                         }.bind(this));
                         
+                        /*
                         $('#md-wrapper').bind('touchmove', function (e) {
                             e.preventDefault();
                         }.bind(this));
+                        */
                         
                         $('.preview-foot').bind('touchmove', function (e) {
                             e.preventDefault();
@@ -602,8 +619,7 @@
                         this._keyoutcontentHeight = this._loadcontentHeight - this._keyHeight + this._additiveHeight;
                         
                     }
-                    
-                    
+ 
                 };
                 
                 this.autoScroll = function (_type) {
@@ -760,8 +776,10 @@
                         this._edit.setSize('auto', content_height + 'px');
                     }
 
+                    /*
                     var md_wrapper_height = $('.preview').height() - ($('.preview-foot').height() + 1);
                     $('#md-wrapper').height(md_wrapper_height);
+                    */
 
                     var foot_tools_wrapper_width = 0;
 
@@ -1049,7 +1067,7 @@
                     
                     var content = _mdcode;
                     var updatetime = Date.parse(new Date());
-                    
+
                     var data = {
                         updatetime : updatetime,
                         content : content
@@ -1212,13 +1230,14 @@
                 });
                 
 				CodeMirrorEditor.on('change', function () {
-                
+
                     if (utilTools().checkDriver().indexOf("ios") == -1 && utilTools().checkDriver().indexOf("android") == -1) {
                     
                         $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
-                        dc.cache(CodeMirrorEditor.getValue());
                         srh.refReshHtml();
                     }
+
+                    dc.cache(CodeMirrorEditor.getValue());
 					
 
 					var ec = CodeMirrorEditor.changeGeneration();
@@ -1268,7 +1287,7 @@
                     if (utilTools().checkDriver().indexOf("ios") > -1 || utilTools().checkDriver().indexOf("android") > -1) {
                     
                         $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
-                        dc.cache(CodeMirrorEditor.getValue());
+                        //dc.cache(CodeMirrorEditor.getValue());
                         srh.refReshHtml();
                     }
                     
