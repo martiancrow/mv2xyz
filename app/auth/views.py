@@ -31,6 +31,9 @@ def unconfirmed():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    if not current_user.is_anonymous:
+        return redirect(url_for('user.post_list'))
+
     form = LoginForm()
 
     if form.validate_on_submit():

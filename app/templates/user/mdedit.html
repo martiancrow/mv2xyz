@@ -338,6 +338,26 @@
                     
                     
                     if (this._drvtype.indexOf('ios')  > -1) {
+
+
+                        $(".CodeMirror-code .CodeMirror-line").bind('touchstart', function () {
+
+                            timeOutEvent = setTimeout(function () {
+
+                                alert("长按事件触发发"); 
+                            }.bind(this), 500);
+                            //e.preventDefault();
+                        });
+
+                        $(".CodeMirror-code .CodeMirror-line").bind('touchmove', function () {
+
+                            clearTimeout(timeOutEvent); 
+                        });
+
+                        $(".CodeMirror-code .CodeMirror-line").bind('touchend', function () {
+
+                            clearTimeout(timeOutEvent);
+                        });
                     
                         //console.log("navigator.userAgent:" + navigator.userAgent)
                         //console.log("navigator.appVersion:" + navigator.appVersion)
@@ -1179,7 +1199,7 @@
                     //var escapedText = text.toLowerCase().replace(/[^\w]+/g, '-');
                     var escapedText = text.toLowerCase();
                                   
-                    if (typeof(headList) != 'undefined') {
+                    if (typeof(headList) != 'undefined' && getindex) {
                         headList.push({
                             level: level,
                             test: text,
@@ -1217,6 +1237,7 @@
                 srh = new scrollHelper(CodeMirrorEditor);
                 sch = new screenHelper(CodeMirrorEditor, srh);
                 headList = new Array();
+                getindex = false;
                 
 
 				//CodeMirrorEditor.setOption('lineNumbers', true);
@@ -1469,7 +1490,9 @@
                     sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
                     
-                    marked(CodeMirrorEditor.getValue())
+                    getindex = true;
+                    marked(CodeMirrorEditor.getValue());
+                    getindex = false;
                     
                     var paperclip = '**目录**  \n';
                     var toplevel = 1;
