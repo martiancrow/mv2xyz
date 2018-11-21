@@ -1,0 +1,206 @@
+<div id="searchlist" class="container-fluid">
+    
+</div>
+
+
+
+<div id="template_post" style="display: none;">
+    <div class="row">
+        <div class="post-item">
+            <div class="post-title">
+                <h2><a v-bind:href="url" v-html="title">${ title }</a></h2>
+                <span class="post-creat">${ creat }</span>
+            </div>
+            <div class="post-summary">
+                <p><a v-bind:href="url" v-html="summary">${ summary }</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/locale/zh-cn.js"></script>
+
+<script type="text/javascript">
+        
+    function utilTools () {
+    
+        var outs = new Object;
+    
+        outs.checkDriver = function () {
+        
+            var ua = navigator.userAgent; 
+            var app = navigator.appVersion;
+            
+            
+            if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                if (ua.indexOf('iPhone') > -1) {
+
+                    if (ua.indexOf('MQQBrowser') > -1) {
+                    
+                        return 'ios_iphone_mqqb';
+                    }
+                    else if (ua.indexOf('MicroMessenger') > -1) {
+                    
+                        return 'ios_iphone_mwxb';
+                    }
+                    else if (navigator.standalone) {
+                    
+                        return 'ios_iphone_safari_webapp';
+                    }
+                
+                    return 'ios_iphone_safari';
+                }
+                else if (ua.indexOf('iPad') > -1) {
+                
+                    return 'ios_ipad_safari';
+                }
+            
+                return 'ios';
+            }
+            else if (ua.indexOf('Android') > -1) {
+                
+                return 'android'
+            }
+            
+            return  'other';
+
+        };
+        
+        return outs;
+    }
+
+</script>
+
+<script type="text/javascript">
+
+    window.onload = function () {
+
+        $(window).scroll(function () {
+            var scrolltop = $(this).scrollTop();
+            var scrollheight = $(document).height();
+            var windowheight = $(this).height();
+
+            if (scrolltop + windowheight > scrollheight -100) {
+                search();
+            }
+        });
+
+        if ($('#search_key').val() != '') {
+            search($('#search_key').val());
+        }
+
+        $('.enter').bind('click', function (_event) {
+            search($('#search_key').val());
+        });
+
+        $(document).keyup(function (_event) {
+            if (_event.which == 13 && $('#search_key').is(':focus')) {
+                search($('#search_key').val());
+            }
+        });
+
+        $('.clear').bind('click', function (_event) {
+            $('#search_key').val('');
+            visibleclearbtn();
+        });
+
+        $('#search_key').bind('input', function (_event) {
+            visibleclearbtn();
+        });
+        
+        
+    };
+
+    function visibleclearbtn() {
+        if ($('#search_key').val() == '') {
+            $('.clear').hide();
+        }
+        else {
+            $('.clear').show();
+        }
+    }
+
+
+    function search(_key) {
+
+
+
+        if (_key != undefined) {
+
+            if (_key == '') {
+                $('#searchlist').html('');
+                NextUri = null
+            }
+            else {
+                $('#searchlist').html('');
+                NextUri = '/user/searchlistjson?key=' + _key;
+            }
+            
+        }
+
+        if (typeof(NextUri) == 'undefined') {
+            NextUri = null;
+        }
+
+        if (NextUri == null) {
+            return;
+        }
+
+        if (typeof(issubmit) == 'undefined' || !issubmit) {
+
+            $.ajax({
+                type: 'GET',
+                url: NextUri,
+                beforeSend: function () {
+                    issubmit = true;
+                },
+                success: function (result) {
+
+                    
+                    if (result && !result.error) {
+
+                        if (result.hasnext) {
+                            NextUri = result.searchpage + "?key=" + result.key + "&page=" + result.nextpageindex;
+                        }
+                        else {
+                            NextUri = null;
+                        }
+
+                        var template_post_html = $('#template_post').html();
+
+                        for (var i = 0; i < result.posts.length; i++) {
+
+                            new Vue({
+                                el: '#template_post',
+                                data: {
+                                    id: result.posts[i].id,
+                                    cid: result.posts[i].cid,
+                                    url: result.posts[i].url,
+                                    title: result.posts[i].title,
+                                    update: moment(result.posts[i].update).fromNow(),
+                                    summary: result.posts[i].summary,
+                                    creat: moment(result.posts[i].creat).format('YYYY.MM.DD')
+                                },
+                                delimiters:['${', '}']});
+
+                            $('#searchlist').append($('#template_post').html());
+
+                            $('#template_post').html(template_post_html)
+                        }
+                    }
+
+                    issubmit = false;
+                },
+                error: function (er) {
+                    console.log(er)
+                    issubmit = false;
+                }
+            });
+        }
+    }
+    
+
+</script>
+

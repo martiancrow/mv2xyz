@@ -31,6 +31,42 @@ def cutstr(src, strlen):
 
     return src
 
+def searchkeycut(txt="", key="", strlen=0):
+
+    if len(txt) > strlen:
+
+        srclen = len(txt)
+
+        cutlength = int(strlen / 2)
+
+        dr = re.search(r".{0,%d}(%s).{0,%d}" % (cutlength, key, cutlength), txt, flags=re.I)
+
+        if dr is not None:
+            span = dr.span()
+
+            txt = dr.group()
+
+            if span[0] > 0:
+                txt = "..." + txt 
+
+            if span[1] < srclen:
+                txt = txt + "..."
+        else:
+            txt = txt[:strlen] + "..."
+
+
+    dr = re.search(r"(%s)" % key, txt, flags=re.I)
+
+    if dr is not None:
+        txt = txt.replace(dr.group(), "<span class='keyword'>%s</span>" % dr.group())
+
+
+    return txt
+
+def search_body_summary(body, key, strlen):
+
+    return searchkeycut(filter_tags(body), key, strlen)
+
 @user.before_app_request
 def before_request():
     current_user
@@ -41,6 +77,15 @@ def before_request():
 def post_list(classid=None):
     
     return render_template('user/postlist.html', cid=classid)
+
+@user.route('/search', methods=['GET'])
+@login_required
+def search_list():
+
+    key = request.args.get('key', type=str, default='')
+    curl = request.referrer if request.referrer else url_for('user.post_list')
+    
+    return render_template('user/searchlist.html', search_key=key, cancelurl=curl)
     
 @user.route('/classlist', methods=['GET'])
 @user.route('/classlist/<int:classid>', methods=['GET'])
@@ -194,6 +239,58 @@ def post_list_json(page, cid=None):
             'title': cutstr(item.post_name, 35),
             'update': item.post_updatetime,
             'summary': get_body_summary(item.post_body_html, 150),
+            'creat': item.post_createtime
+        }
+
+        result['posts'].append(post)
+
+    return jsonify(result)
+
+@user.route('/searchlistjson', methods=['GET'])
+@login_required
+def search_list_json():
+
+    key = request.args.get('key', type=str, default=None)
+
+    if key is None:
+        result = {
+            'error': 401
+        }
+
+        return jsonify(result)
+
+    page = request.args.get('page', type=int, default=1)
+
+
+    pagination = res_post.query.filter_by(
+        author_id=current_user.user.ua_user_id).filter(
+        res_post.post_name.like('%' + key + '%')).order_by(
+        res_post.post_updatetime.desc()).paginate(
+        page, per_page=20, error_out=False)
+
+            
+    posts = pagination.items
+
+    result = {
+        'key': key,
+        'hasnextpage': pagination.has_next,
+        'searchpage': url_for('user.search_list_json')
+    }
+
+
+    if pagination.has_next:
+        result['nextpageindex'] = pagination.next_num
+
+    result['posts'] = []
+
+    for item in posts:
+        post = {
+            'id': item.post_id,
+            'cid': item.post_cid if item.post_cid is not None else 0,
+            'url': url_for('user.edit_post', postid=item.post_id),
+            'title': searchkeycut(item.post_name, key, 36),
+            'update': item.post_updatetime,
+            'summary': search_body_summary(item.post_body_html, key, 60),
             'creat': item.post_createtime
         }
 

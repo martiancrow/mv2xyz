@@ -13,14 +13,15 @@ div.login-box {width: 100%;overflow: hidden;}
 
 div.post-list {width: 100%;overflow: hidden;padding-top: 50px;}
 div.post-list a {display: block;overflow: hidden;}
-div.post-item {width: 100%;overflow: hidden;margin: 10px 0;border-bottom: 1px solid #ddd;position:relative;}
-div.post-title {width: 100%;height: 20px;overflow: hidden;float: left;line-height: 20px;}
-div.post-title h2 {font-size: 16px;float: left;}
-div.post-title span {font-size: 12px;color: #969696;float: right;}
-div.post-summary {width: 100%;margin: 5px auto 0 auto;overflow: hidden;float: left;}
-div.post-summary p {font-size: 12px;color: #969696}
-div.post-footer {width: 100%;overflow: hidden;float: left;height: 15px;line-height: 15px;margin: 5px 0;}
-div.post-footer span {font-size: 12px;color: #969696;}
+
+#posts .post-item {width: 100%;overflow: hidden;margin: 10px 0;border-bottom: 1px solid #ddd;position:relative;}
+#posts .post-item .post-title {width: 100%;height: 20px;overflow: hidden;float: left;line-height: 20px;}
+#posts .post-item .post-title h2 {font-size: 16px;float: left;}
+#posts .post-item .post-title span {font-size: 12px;color: #969696;float: right;}
+#posts .post-item .post-summary {width: 100%;margin: 5px auto 0 auto;overflow: hidden;float: left;}
+#posts .post-item .post-summary p {font-size: 12px;color: #969696}
+#posts .post-item .post-footer {width: 100%;overflow: hidden;float: left;height: 15px;line-height: 15px;margin: 5px 0;}
+#posts .post-item .post-footer span {font-size: 12px;color: #969696;}
 
 .post-option {height:100%;position:absolute;right:calc(-42px * 2);top:0;overflow:hidden;}
 .post-option .post-option-left {height:100%;float:right;overflow:hidden;}
@@ -74,3 +75,24 @@ div.post-footer span {font-size: 12px;color: #969696;}
 .move-class-global-option .class-move {float:right;}
 
 
+#searchlist .post-item {width: 100%;overflow: hidden;margin: 10px 0;border-bottom: 1px solid #ddd;position:relative;}
+#searchlist .post-item .keyword {background-color: #FFFF00;}
+#searchlist .post-item .post-title {width: 100%;height: 20px;overflow: hidden;float: left;line-height: 20px;}
+#searchlist .post-item .post-title h2 {font-size: 16px;float: left;}
+#searchlist .post-item .post-title .post-creat {font-size: 12px;color: #969696;float: right;}
+#searchlist .post-item .post-summary {width: 100%;margin: 5px auto 0 auto;overflow: hidden;float: left;}
+#searchlist .post-item .post-summary p {font-size: 12px;color: #969696}
+#searchlist .post-item .post-summary a{color: #969696}
+#searchlist .post-item .post-footer {width: 100%;overflow: hidden;float: left;height: 15px;line-height: 15px;margin: 5px 0;}
+
+.search-head {width: 100%;height:50px;overflow: hidden;position:fixed;border-bottom:solid 1px #e7e7e7;font-size:16px;}
+.search-head .search-head-left {width: 15px;height:50px;overflow: hidden;position:relative;float:left;box-sizing:border-box;}
+.search-head .search-head-center {width: calc(100% - 15px - 50px);height:100%;overflow: hidden;position:relative;float:left;box-sizing:border-box;text-align:center;}
+.search-head .search-head-center .search-input {width: calc(100% - 50px);height:100%;overflow: hidden;position:relative;float:left;box-sizing:border-box;text-align:center;}
+.search-head .search-head-center .search-input .type {overflow: hidden;position:absolute;left: 10px; top:50%;font-size: 18px;margin-top: -9px;color: #C0C0C0;cursor: pointer;}
+.search-head .search-head-center .search-input input {width: 100%;height:40px;border: solid 1px #C0C0C0;border-radius: 12px;margin: 5px auto;padding: 0 32px;line-height:40px;font-size: 16px;}
+.search-head .search-head-center .search-input .clear {overflow: hidden;position:absolute;right: 10px; top:50%;font-size: 18px;margin-top: -9px;color: #C0C0C0;cursor: pointer;}
+.search-head .search-head-center .search-enter {width: 50px;height:100%;line-height:50px;overflow: hidden;position:relative;float:left;box-sizing:border-box;text-align:center;}
+.search-head .search-head-center .search-enter .enter {cursor: pointer;}
+.search-head .search-head-right {width: 50px;height:100%;overflow: hidden;position:relative;float:left;box-sizing:border-box;}
+.search-head .search-head-right .cancel {font-size: 14px;text-align: center;line-height: 50px;}

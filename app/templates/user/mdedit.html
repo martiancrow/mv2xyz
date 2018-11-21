@@ -1187,8 +1187,9 @@
 
 
                     if (/^.*\+\+(.+)\+\+.*/.test(text)) { 
-                        var instext = text.match(/\+\+.+?\+\+/g)[0].replace(/^\+\+|\+\+$/g, "")
-                        text = text.replace(/\+\+.+?\+\+/, "<ins>" + instext + "</ins>")
+                        var instext = text.match(/[\+]{2}(.+?)[\+]{2}/)[1];
+                        //var instext = text.match(/\+\+.+?\+\+/g)[0].replace(/^\+\+|\+\+$/g, "");
+                        text = text.replace(/\+\+.+?\+\+/, "<ins>" + instext + "</ins>");
 
                     }
 

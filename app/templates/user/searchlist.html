@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}mv2{% endblock %}
+
+{% block navbar %}
+<div class="search-head">
+    <div class="search-head-left">
+        
+    </div>
+    <div class="search-head-center">
+        <div class="search-input">
+        	<i class="type fa fa-search"></i>
+        	<input id="search_key" type="text" value="{{ search_key }}" placeholder="查找..." />
+        	<i class="clear fa fa-times-circle"></i>
+        </div>
+        <div class="search-enter">
+            <i class="enter fa fa-arrow-right"></i>
+        </div>
+    </div>
+    <div class="search-head-right">
+        <div class="cancel">
+            <a href="{{ cancelurl }}">
+                取消
+            </a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{% include 'user/_search.html' %}
+{% endblock %}
+
+{% block page_foot %}
+{% endblock %}
