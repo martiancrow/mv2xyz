@@ -11,7 +11,10 @@
 
         <link href="{{ url_for('static', filename='common.css') }}" rel="stylesheet">
         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/codemirror.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/fold/foldgutter.min.css" rel="stylesheet">
+
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css" rel="stylesheet">
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 		<!--<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">-->
@@ -20,9 +23,10 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="{{ url_for('static', filename='codemirror_5.38.0.js') }}"></script>
         <script src="{{ url_for('static', filename='codemirror_importmode_5.38.0.js') }}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/fold/foldcode.min.js"></script>
+        <script src="{{ url_for('static', filename='codemirror/addon/fold/foldgutter.js') }}"></script>
+        <script src="{{ url_for('static', filename='codemirror/addon/fold/md_base64link_fold.js') }}"></script>
 		<!--<script src="https://cdn.bootcss.com/codemirror/5.38.0/codemirror.min.js"></script>-->
-		
-        
 		
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.19/marked.min.js"></script>
 		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
@@ -31,6 +35,8 @@
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/markdown.min.js"></script>
+
+        <script src="https://cdn.bootcss.com/downloadjs/1.4.8/download.min.js"></script>
         
         
         
@@ -38,10 +44,11 @@
 		<style type="text/css">
 			html, body {height: 100%;font-size:14px;}
             .CodeMirror {font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+            .CodeMirror-gutters {border-right:0px; background-color:#fff; }
 			.warpper {width: 100%;height: 100%;top: 0;background-color: #ddd;float: left;}
 			.title {width: 100%;height: 50px;padding-left: 12px;overflow: hidden;border-bottom: 1px solid #ddd;float: left;background-color: #fff;box-sizing: border-box;}
 			.title input[type=text] {width: 100%;height: 100%;border: 0px;font-size: 26px;line-height: 49px;}
-			.content {width: 100%;padding-left: 12px;box-sizing: border-box;float: left;background-color: #fff;overflow:hidden;position:relative}
+			.content {width: 100%;box-sizing: border-box;float: left;padding-left: 3px;background-color: #fff;overflow:hidden;position:relative}
             #mv2_input {display: none;}
             #hide_input {opacity:0;position:absolute;width:0;height:0;top:-500px;}
 
@@ -70,17 +77,18 @@
 			.foot .toolsbar {width: 100%;height: 50px;position: relative;float: left;border-bottom: 1px solid #ddd;box-sizing: border-box;}
 			.foot .toolsbar i {line-height: 50px;cursor: pointer;}
 
-			.foot .toolsbar .tools-left {margin-left: 10px;height: 100%;float: left;width: 85%;overflow: hidden;}
+			.foot .toolsbar .tools-left {margin-left: 10px;height: 100%;float: left;width:calc(100% - 62px - 10px - 16px);overflow: hidden;position: relative;}
 			.foot .toolsbar .tools-left .tools-left-warpper {height: 100%;float: left;position: relative;touch-action:none;}
 			.foot .toolsbar .tools-left .option{margin-right: 25px;float: left;display: block;}
-			.foot .toolsbar .tools-right {margin-right: 10px;height: 100%;float: right;overflow: hidden;}
+			.foot .toolsbar .tools-right {margin-right: 0;width: 62px;height: 100%;float: right;overflow: hidden;position: relative;}
+            .foot .toolsbar .tools-right i {margin-right: 10px;}
 
 			#upload-file {width: 100%;height: 50px;float: left;position: relative;display:none;}
             #upload-file .container-fluid {margin-left:10px;height:100%;width:calc(100% - 10px);float:left;overflow:hidden;}
 			#upload-file .upload-type {overflow: hidden;}
 			#upload-file .upload-type .upload-btn {margin-right: 25px;float: left;text-align: center;position: relative;height:50px;}
 			#upload-file .upload-type .upload-btn i {line-height: 50px;cursor: pointer;}
-			.file-upload-input {width: 100%;height: 100%;position: absolute;top: 0;z-index: 999;opacity: 0;cursor: pointer;}
+            .file-upload-input-file {width: 100%;height: 100%;position: absolute;top: 0;z-index: 999;opacity: 0;cursor: pointer;}
 
 			#upload-file .upload-msg {width:100%;height:100%;overflow: hidden;display: none;float:left;position:absolute;top:0;left:0;}
             #upload-file .upload-msg .progress {width:100%;height:100%;background-color:rgba(0, 0, 0, 0.8);}
@@ -127,9 +135,9 @@
 							<i id="insert-quote" class="fa fa-quote-left fa-lg option"></i>
 							<i id="insert-indent" class="fa fa-indent fa-lg option"></i>
                             <i id="insert-code" class="fa fa-code fa-lg option"></i>
-                            <i id="insert-horizontal-rule" class="fa fa-minus fa-lg option"></i>
+                            <i id="insert-horizontal-rule" class="fa fa-window-minimize fa-lg option"></i>
 							<i id="insert-list-ul" class="fa fa-list-ul fa-lg option"></i>
-                            <i id="insert-paperclip" class="fa fa-paperclip fa-lg option"></i>
+                            <i id="insert-headindex" class="fa fa-list-alt fa-lg option"></i>
                             <!--<i id="insert-list-ol" class="fa fa-list-ol fa-lg option"></i>-->
                             <i id="insert-check-square-o" class="fa fa-check-square-o fa-lg option"></i>
                             <i id="insert-square-o" class="fa fa-square-o fa-lg option"></i>
@@ -141,6 +149,7 @@
 						</div>
 					</div>
 					<div class="tools-right">
+                        <i id="export-md" class="fa fa-download fa-lg"></i>
 						<i id="show-preview" class="fa fa-desktop fa-lg"></i>
 					</div>	
 				</div> 
@@ -148,21 +157,25 @@
 					<div class="container-fluid">
     					<div class="upload-type">
     						<div class="upload-btn">
-    							<input class="file-upload-input" id="file-img-upload" accept="image/*" type="file">
+    							<input class="file-upload-input-file file-upload-input" id="file-img-upload" accept="image/*" type="file" title="普通上传"/>
     							<i class="fa fa-file-image-o fa-lg option"></i>
     						</div>
                             <div class="upload-btn">
-    							<input class="file-upload-input" id="file-movie-upload" accept="video/*" type="file">
-    							<i class="fa fa-file-movie-o fa-lg option"></i>
-    						</div>
+                                <input class="file-upload-input-file file-upload-inputb64" id="file-img-uploadb64" accept="image/*" type="file" title="base64上传"/>
+                                <i class="fa fa-camera-retro fa-lg option"></i>
+                            </div>
                             <div class="upload-btn">
-    							<input class="file-upload-input" id="file-audio-upload" accept="audio/*" type="file">
-    							<i class="fa fa-file-audio-o fa-lg option"></i>
-    						</div>
-                            <div class="upload-btn">
-    							<input class="file-upload-input" id="file-file-upload" accept="" type="file">
+    							<input class="file-upload-input-file file-upload-input" id="file-file-upload" accept="" type="file" title="普通上传"/>
     							<i class="fa fa-file-o fa-lg option"></i>
     						</div>
+                            <div class="upload-btn">
+                                <input class="file-upload-input-file file-upload-inputb64" id="file-file-uploadb64" accept="" type="file" title="base64上传"/>
+                                <i class="fa fa-file fa-lg option"></i>
+                            </div>
+                            <div class="upload-btn">
+                                <input class="file-upload-input-file" id="file-open-md" accept="" type="file" title="base64上传"/>
+                                <i class="fa fa-upload fa-lg option"></i>
+                            </div>
     					</div>
 					</div>
                     <div class="upload-msg">
@@ -1176,12 +1189,17 @@
 
                 CodeMirrorEditor = CodeMirror($('.content')[0], {
                     value: mv2input.value,
-					lineWrapping: true
+                    //lineNumbers: true, 
+					lineWrapping: true,
+                    foldGutter: true,
+                    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
 				});
 
-
+                foldAll();
 
 				var rendererMD = new marked.Renderer();
+
+
 
                 rendererMD.text = function(text) {
 
@@ -1195,6 +1213,39 @@
 
                     
                     return text;
+                };
+
+                rendererMD.link = function(href, title, text) {
+
+                    var linkhtml = "<a href=\"{href}\" title=\"{title}\" download=\"{download}\">{text}</a>";
+
+                    linkhtml = linkhtml.replace(/\{text\}/, text);
+
+                    if (/^#{1}.*/gi.test(href)) { 
+
+                        linkhtml = linkhtml.replace(/download="\{download\}"/gi, '');
+                    }
+                    else {
+                        linkhtml = linkhtml.replace(/\{download\}/, text);
+                    }
+
+                    if (title) {
+                        linkhtml = linkhtml.replace(/\{title\}/gi, title);
+                    }
+                    else {
+                        linkhtml = linkhtml.replace(/title="\{title\}"/gi, '');
+                    }
+
+                    if (/^(data:){1}.*(base64){1}.*/gi.test(href)) { 
+                        var fileblob = getBlob(href);
+                        linkhtml = linkhtml.replace(/\{href\}/, URL.createObjectURL(fileblob));
+                    }
+                    else {
+                        linkhtml = linkhtml.replace(/\{href\}/, href);
+                    }
+
+                    
+                    return linkhtml;
                 };
 
 				rendererMD.listitem = function(text) {
@@ -1252,8 +1303,7 @@
                 srh = new scrollHelper(CodeMirrorEditor);
                 sch = new screenHelper(CodeMirrorEditor, srh);
                 headList = new Array();
-                getindex = false;
-                
+                getindex = false;                
 
 				//CodeMirrorEditor.setOption('lineNumbers', true);
                 //CodeMirrorEditor.inputStyle
@@ -1297,6 +1347,7 @@
 					}
                     
                     srh.refReshEdit();
+                    foldAll();
 
 
 				});
@@ -1517,7 +1568,7 @@
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
 				});
                 
-                $('#insert-paperclip').bind('click', function () {
+                $('#insert-headindex').bind('click', function () {
                     sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
                     
@@ -1525,7 +1576,7 @@
                     marked(CodeMirrorEditor.getValue());
                     getindex = false;
                     
-                    var paperclip = '**目录**  \n';
+                    var headindex = '**目录**  \n';
                     var toplevel = 1;
                     
 
@@ -1541,10 +1592,10 @@
                             ex_level_txt += '- '
                         }
                     
-                        paperclip += '- ' + ex_level_txt + '[' + headList[i].test + '](#' + headList[i].id + ')  \n';
+                        headindex += '- ' + ex_level_txt + '[' + headList[i].test + '](#' + headList[i].id + ')  \n';
                     }
                     
-                    CodeMirrorEditor.replaceSelection(paperclip)
+                    CodeMirrorEditor.replaceSelection(headindex)
 					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch);
                     
@@ -1656,6 +1707,62 @@
 
 			    });
 
+                $('.file-upload-inputb64').bind('change', function () {
+                    var obj = this;
+                                        
+                    if (obj.files) {
+
+                        for (var i = 0; i < obj.files.length; i++) {
+
+                            var fr = new FileReader();
+
+                            fr.onload = (function (file, evt) {
+
+                                return function (evt) {
+
+                                    var base64Code = this.result;
+                                    insert_file(file, base64Code);
+                                }
+
+                            })(obj.files[i]);
+
+                            fr.readAsDataURL(obj.files[i])
+                        }
+
+                    }
+                });
+
+                $('#file-open-md').bind('change', function () {
+                    var obj = this;
+                                        
+                    if (obj.files) {
+
+                        for (var i = 0; i < obj.files.length; i++) {
+
+                            var fr = new FileReader();
+
+                            fr.onload = (function (file, evt) {
+
+                                return function (evt) {
+
+                                    var base64Code = this.result;
+                                    open_md(file, base64Code);
+                                }
+
+                            })(obj.files[i]);
+
+                            fr.readAsDataURL(obj.files[i])
+                        }
+
+                    }
+                });
+
+                $('#export-md').bind('click', function () {
+
+                    export_md_file();
+                });
+
+                
 			}
 
 			$(document).bind('mousemove', function (e) {
@@ -1920,6 +2027,109 @@
 		        xhr.send(file);  
 		        
 		    }
+
+            function insert_file(file, base64code) {
+
+                var cursor = CodeMirrorEditor.getCursor();
+
+                var filemd = '[' + file.name + '](' + base64code + ')';
+                        
+                if (file.type.indexOf("image") > -1) {
+                    filemd = '![' + file.name + '](' + base64code + ')';
+                }
+
+                CodeMirrorEditor.replaceSelection(filemd)
+                //CodeMirrorEditor.focus();                 
+                CodeMirrorEditor.setCursor(cursor.line, 0);
+
+                //CodeMirrorEditor.foldCode(CodeMirror.Pos(_cursor.line, 0));
+                
+            }
+
+            function open_md(file, base64code) {
+
+                var data = base64code.replace(/^(data:){1}.*(base64,){1}/gi, '');
+
+                var title = file.name.replace(/(\.){1}[^.]*$/gi, '');
+
+                $("#title").val(title);
+
+                CodeMirrorEditor.setValue(getString(data));
+                
+                
+            }
+
+            function export_md_file() {
+
+                var mdtxt = CodeMirrorEditor.getValue();
+
+                var mdbase64 = 'data:text/plain;charset=UTF-8;base64,' + getBase64(mdtxt);
+
+                var mdblob = getBlob(mdbase64);
+
+                download(mdblob, $("#title").val() + '.md', 'text/plain');
+
+            }
+
+            function foldAll () {
+                for (var i = CodeMirrorEditor.firstLine(), e = CodeMirrorEditor.lastLine(); i <= e; i++) {
+                    CodeMirrorEditor.foldCode(CodeMirror.Pos(i, 0), null, "fold");
+                }
+
+            }
+
+            function getString (_b64c) { 
+                return decodeURIComponent(escape(window.atob(_b64c)));
+            } 
+
+            function getBase64 (_str) { 
+                return window.btoa(unescape(encodeURIComponent(_str)));
+            } 
+
+            function getMine (_b64c) {
+                var mine = /data:([^;]*);/i.exec(_b64c)[1];
+                
+                return mine;
+            }
+            
+            function getBlob (_b64c) {
+
+                var format = getMine(_b64c);
+                var base64 = _b64c;
+                var code = window.atob(base64.split(",")[1]);
+                var aBuffer = new window.ArrayBuffer(code.length);
+                var uBuffer = new window.Uint8Array(aBuffer);
+                
+                for (var i = 0; i < code.length; i++) {
+                    uBuffer[i] = code.charCodeAt(i) & 0xff ;
+                }
+                
+                var blob = null;
+                
+                try {
+                    blob = new Blob([uBuffer], {type : format});
+                }
+                catch (e) {
+                    window.BlobBuilder = window.BlobBuilder ||
+                    window.WebKitBlobBuilder ||
+                    window.MozBlobBuilder ||
+                    window.MSBlobBuilder;
+
+                    if (e.name == 'TypeError' && window.BlobBuilder) {
+                        var bb = new window.BlobBuilder();
+                        bb.append(uBuffer.buffer);
+                        blob = bb.getBlob("image/jpeg");
+                    }
+                    else if (e.name == "InvalidStateError") {
+                        blob = new Blob([aBuffer], {type : format});
+                    }
+                    else {
+
+                    }
+                }
+                
+                return blob;
+            }
 			
 		</script>
 	</body>

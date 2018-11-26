@@ -105,10 +105,17 @@
                             img.src = URL.createObjectURL(blob);
                             
                             
-                            
+                            console.log(blob)
                             console.log(blob)
                             console.log(URL.createObjectURL(blob))
                             console.log(file)
+
+                            var atag = "<a class='downloadlink' href='" + URL.createObjectURL(blob) + "'>" + file.name + "</a><br/>"
+                            var imgtag = "<img src='" + URL.createObjectURL(blob) +"' alt='" + file.name + "'/><br/>"
+
+                            $('#filelink').append(atag)
+                            
+                            
                         }
 
                     })(obj.files[i]);
@@ -127,7 +134,7 @@
             
                 var obj = $(this)
                 var filename = obj.html();
-                var fileblob = getBlbo(this.href);
+                var fileblob = getBlob(this.href);
                 
                 /*
                 if (navigator.msSaveBlob) {
@@ -157,7 +164,7 @@
             return mine;
         }
         
-        function getBlbo (_b64c) {
+        function getBlob (_b64c) {
 
             var format = getMine(_b64c);
             var base64 = _b64c;
@@ -165,34 +172,36 @@
             var aBuffer = new window.ArrayBuffer(code.length);
             var uBuffer = new window.Uint8Array(aBuffer);
             
-            for(var i = 0; i < code.length; i++){
+            for (var i = 0; i < code.length; i++) {
                 uBuffer[i] = code.charCodeAt(i) & 0xff ;
             }
             
             console.info([aBuffer]);
             console.info(uBuffer);
             console.info(uBuffer.buffer);
-            console.info(uBuffer.buffer==aBuffer); //true
+            console.info(uBuffer.buffer == aBuffer); //true
             
-            var blob=null;
+            var blob = null;
             
-            try{
+            try {
                 blob = new Blob([uBuffer], {type : format});
             }
-            catch(e){
+            catch (e) {
                 window.BlobBuilder = window.BlobBuilder ||
                 window.WebKitBlobBuilder ||
                 window.MozBlobBuilder ||
                 window.MSBlobBuilder;
-                if(e.name == 'TypeError' && window.BlobBuilder){
+
+                if (e.name == 'TypeError' && window.BlobBuilder) {
                     var bb = new window.BlobBuilder();
                     bb.append(uBuffer.buffer);
                     blob = bb.getBlob("image/jpeg");
                 }
-                else if(e.name == "InvalidStateError"){
+                else if (e.name == "InvalidStateError") {
                     blob = new Blob([aBuffer], {type : format});
                 }
-                else{
+                else {
+
                 }
             }
             
