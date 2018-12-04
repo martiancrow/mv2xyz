@@ -12,31 +12,34 @@
         <link href="{{ url_for('static', filename='common.css') }}" rel="stylesheet">
         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/codemirror.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/fold/foldgutter.min.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='codemirror/5.38.0/codemirror.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='codemirror/5.38.0/addon/fold/foldgutter.min.css') }}" rel="stylesheet">
 
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css" rel="stylesheet">
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='github-markdown-css/2.10.0/github-markdown.min.css') }}" rel="stylesheet">
+		
 		<!--<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">-->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='highlight.js/9.12.0/styles/github.min.css') }}" rel="stylesheet">
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="{{ url_for('static', filename='codemirror_5.38.0.js') }}"></script>
-        <script src="{{ url_for('static', filename='codemirror_importmode_5.38.0.js') }}"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/fold/foldcode.min.js"></script>
-        <script src="{{ url_for('static', filename='codemirror/addon/fold/foldgutter.js') }}"></script>
-        <script src="{{ url_for('static', filename='codemirror/addon/fold/md_base64link_fold.js') }}"></script>
+        <link href="{{ url_for('static', filename='font-awesome/5.5.0/css/all.min.css') }}" rel="stylesheet">
+
+		<script src="{{ url_for('static', filename='jquery/3.3.1/jquery.min.js') }}"></script>
+
+        <script src="{{ url_for('static', filename='codemirror/5.38.0/codemirror.js') }}"></script>
+        <script src="{{ url_for('static', filename='codemirror/5.38.0/codemirror_importmode.js') }}"></script>
+        <script src="{{ url_for('static', filename='codemirror/5.38.0/addon/fold/foldcode.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='codemirror/5.38.0/addon/fold/foldgutter.js') }}"></script>
+        <script src="{{ url_for('static', filename='codemirror/5.38.0/addon/fold/md_base64link_fold.js') }}"></script>
 		<!--<script src="https://cdn.bootcss.com/codemirror/5.38.0/codemirror.min.js"></script>-->
 		
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.19/marked.min.js"></script>
+        <script src="{{ url_for('static', filename='marked/0.3.19/marked.min.js') }}"></script>
 		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.2.0/iscroll.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/javascript.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/markdown.min.js"></script>
+        <script src="{{ url_for('static', filename='iScroll/5.2.0/iscroll.min.js') }}"></script>
 
-        <script src="https://cdn.bootcss.com/downloadjs/1.4.8/download.min.js"></script>
+        <script src="{{ url_for('static', filename='highlight.js/9.12.0/highlight.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='highlight.js/9.12.0/languages/javascript.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='highlight.js/9.12.0/languages/markdown.min.js') }}"></script>
+
+        <script src="{{ url_for('static', filename='downloadjs/1.4.8/download.min.js') }}"></script>
         
         
         
@@ -45,50 +48,56 @@
 			html, body {height: 100%;font-size:14px;}
             .CodeMirror {font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
             .CodeMirror-gutters {border-right:0px; background-color:#fff; }
+            .page-progress-bar {width: 100%;height: 2px;position: absolute;top: 0;left: 0;z-index: 9999;display: none;}
+            .page-progress-bar .bar {width: 0%;height: 100%;float: left;position: relative;background-color: rgb(48, 177, 50);}
 			.warpper {width: 100%;height: 100%;top: 0;background-color: #ddd;float: left;}
-			.title {width: 100%;height: 50px;padding-left: 12px;overflow: hidden;border-bottom: 1px solid #ddd;float: left;background-color: #fff;box-sizing: border-box;}
-			.title input[type=text] {width: 100%;height: 100%;border: 0px;font-size: 26px;line-height: 49px;}
+            
+			.title {width: 100%;height: 50px;overflow: hidden;border-bottom: 1px solid #ddd;float: left;background-color: #fff;box-sizing: border-box;}
+			.title input[type=text] {width: 100%;height: 100%;padding: 0 0 0 12px;border: 0px;font-size: 26px;line-height: 49px;box-sizing: border-box;}
 			.content {width: 100%;box-sizing: border-box;float: left;padding-left: 3px;background-color: #fff;overflow:hidden;position:relative}
             #mv2_input {display: none;}
             #hide_input {opacity:0;position:absolute;width:0;height:0;top:-500px;}
 
-			.preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;}
-            /*#md-wrapper {width: 100%;overflow-x: hidden;overflow-y: auto;float: left;position:relative}*/
-            #md-wrapper {width: 100%;float: left;position:relative}
-			/*.markdown-body {width: 100%;overflow: hidden;padding: 18px 21px;box-sizing: border-box;float: left;}*/
-            .markdown-body {width: 100%;overflow: hidden;padding: 18px 21px 68px 21px;box-sizing: border-box;float: left;}
-			/*.preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}*/
-            .preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;position: fixed;bottom: 0;}
+			/*.preview {display: block;top: 0;position: absolute;width: 100%;background-color: #fff;z-index: 999;overflow: hidden;}*/
+            .preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;overflow: hidden;}
+            /*#md-wrapper {width: 100%;float: left;position:relative}*/
+            #md-wrapper {width: 100%;height: calc(100% - 50px);overflow-x: hidden;overflow-y: auto;float: left;position:relative;-webkit-overflow-scrolling: touch;}
+            /*.markdown-body {width: 100%;overflow: hidden;padding: 18px 21px 68px 21px;box-sizing: border-box;float: left;}*/
+			.markdown-body {width: 100%;overflow: hidden;padding: 18px 21px;box-sizing: border-box;float: left;}
+            /*.preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;position: fixed;bottom: 0;}*/
+            .preview-foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;box-sizing: border-box;float: left;}
 			.preview-foot i {line-height: 50px;float: left;cursor: pointer;}
-			.preview-foot .tools-left {margin-left: 10px;height: 100%;float: left;overflow: hidden;}
-			.preview-foot .tools-right {margin-right: 10px;height: 100%;float: right;overflow: hidden;}
+			.preview-foot .tools-left {height: 100%;float: left;overflow: hidden;}
+            .preview-foot .tools-left i {margin-left: 10px;}
+			.preview-foot .tools-right {height: 100%;float: right;overflow: hidden;}
+            .preview-foot .tools-right i {margin-right: 10px;}
             
             .new-file-msg {display: none;top: 0;position: absolute;width: 100%;height: 100%;background-color: rgba(0, 0, 0, 0.5);z-index: 9999;}
 
 			.head {width: 100%;height: 50px;background-color: #fff;float: left;}
-			.head i {line-height: 50px;float: left;cursor: pointer;}
-			.head .tools-left {margin-left: 10px;height: 100%;float: left;overflow: hidden;}
-			.head .tools-right {margin-right: 10px;height: 100%;float: right;overflow: hidden;}
-			.head .tools-right .option{margin-right: 10px;}
+            .head .open-md {position: relative;}
+			.head .tools-left {height: 100%;float: left;overflow: hidden;}
+            .head .tools-left .option {line-height: 50px;float: left;cursor: pointer;margin-left: 10px;}
+			.head .tools-right {height: 100%;float: right;overflow: hidden;}
+			.head .tools-right .option {line-height: 50px;float: left;cursor: pointer;margin-right: 10px;}
 			.head .tools-right .disable:before{color:#c0c0c0;}
-			.head .tools-right .save{margin-left: 10px;}
 			
 			.foot {width: 100%;height: 50px;background-color: #fff;border-top: 1px solid #ddd;float: left;overflow: hidden;z-index: 999;box-sizing: border-box;}
 			.foot .toolsbar {width: 100%;height: 50px;position: relative;float: left;border-bottom: 1px solid #ddd;box-sizing: border-box;}
 			.foot .toolsbar i {line-height: 50px;cursor: pointer;}
 
-			.foot .toolsbar .tools-left {margin-left: 10px;height: 100%;float: left;width:calc(100% - 62px - 10px - 16px);overflow: hidden;position: relative;}
+			.foot .toolsbar .tools-left {margin-left: 10px;height: 100%;float: left;width:calc(100% - 24px - 10px - 16px);overflow: hidden;position: relative;}
 			.foot .toolsbar .tools-left .tools-left-warpper {height: 100%;float: left;position: relative;touch-action:none;}
 			.foot .toolsbar .tools-left .option{margin-right: 25px;float: left;display: block;}
-			.foot .toolsbar .tools-right {margin-right: 0;width: 62px;height: 100%;float: right;overflow: hidden;position: relative;}
-            .foot .toolsbar .tools-right i {margin-right: 10px;}
+			.foot .toolsbar .tools-right {margin-right: 0;width: 34px;height: 100%;float: right;overflow: hidden;position: relative;}
+            .foot .toolsbar .tools-right i {margin-right: 10px;float: right;}
 
 			#upload-file {width: 100%;height: 50px;float: left;position: relative;display:none;}
             #upload-file .container-fluid {margin-left:10px;height:100%;width:calc(100% - 10px);float:left;overflow:hidden;}
 			#upload-file .upload-type {overflow: hidden;}
 			#upload-file .upload-type .upload-btn {margin-right: 25px;float: left;text-align: center;position: relative;height:50px;}
 			#upload-file .upload-type .upload-btn i {line-height: 50px;cursor: pointer;}
-            .file-upload-input-file {width: 100%;height: 100%;position: absolute;top: 0;z-index: 999;opacity: 0;cursor: pointer;}
+            .file-upload-input-file {width: 100%;height: 100%;position: absolute;top: 0;left: 0;z-index: 999;opacity: 0;cursor: pointer;}
 
 			#upload-file .upload-msg {width:100%;height:100%;overflow: hidden;display: none;float:left;position:absolute;top:0;left:0;}
             #upload-file .upload-msg .progress {width:100%;height:100%;background-color:rgba(0, 0, 0, 0.8);}
@@ -98,6 +107,9 @@
 		</style>
 	</head>
 	<body>
+        <div class="page-progress-bar">
+            <div class="bar"></div>
+        </div>
 		<div class="warpper">
 			{% if postid %}
 			<input id="postid" type="hidden" value="{{ postid }}">
@@ -105,15 +117,19 @@
 			{% endif %}
             <textarea id="mv2_input">{% if content %}{{ content }}{% endif %}</textarea>
             <input id="hide_input" type="text" value=""/>
-			
+
 			<div class="head">
 				<div class="tools-left">
-					<i id="head-goback" class="fa fa-long-arrow-left fa-lg fa-fw"></i>
+					<i id="head-goback" class="fas fa-arrow-left fa-lg fa-fw option"></i>
 				</div>
 				<div class="tools-right">
 					<i id="undo-btn" class="fa fa-undo fa-lg fa-fw option disable"></i>
-					<i id="redo-btn" class="fa fa-repeat fa-lg fa-fw option disable"></i>
-					<i id="save-btn" class="fa fa-save fa-lg fa-fw save"></i>
+					<i id="redo-btn" class="fa fa-redo fa-lg fa-fw option disable"></i>
+                    <i class="fas fa-file-upload fa-lg fa-fw option open-md">
+                        <input class="file-upload-input-file" id="file-open-md" accept="" type="file" title="base64上传"/>
+                    </i>
+                    <i id="export-md" class="fa fa-file-download fa-lg fa-fw option"></i>
+					<i id="save-btn" class="fa fa-save fa-lg fa-fw option"></i>
 				</div>					
 			</div>
 			<div class="title">
@@ -126,7 +142,7 @@
 				<div class="toolsbar">
 					<div class="tools-left">
 						<div id="foot-tools-left-wrapper"  class="tools-left-warpper">
-							<i id="insert-head" class="fa fa-header fa-lg option"></i>
+							<i id="insert-head" class="fas fa-heading fa-lg option"></i>
 							<i id="insert-bold" class="fa fa-bold fa-lg option"></i>
                             <i id="insert-italic" class="fa fa-italic fa-lg option"></i>
                             <i id="insert-underline" class="fa fa-underline fa-lg option"></i>
@@ -137,10 +153,10 @@
                             <i id="insert-code" class="fa fa-code fa-lg option"></i>
                             <i id="insert-horizontal-rule" class="fa fa-window-minimize fa-lg option"></i>
 							<i id="insert-list-ul" class="fa fa-list-ul fa-lg option"></i>
-                            <i id="insert-headindex" class="fa fa-list-alt fa-lg option"></i>
+                            <i id="insert-headindex" class="fas fa-clipboard-list fa-lg option"></i>
                             <!--<i id="insert-list-ol" class="fa fa-list-ol fa-lg option"></i>-->
-                            <i id="insert-check-square-o" class="fa fa-check-square-o fa-lg option"></i>
-                            <i id="insert-square-o" class="fa fa-square-o fa-lg option"></i>
+                            <i id="insert-check-square-o" class="far fa-check-square fa-lg option"></i>
+                            <i id="insert-square-o" class="far fa-square fa-lg option"></i>
                             <i id="insert-link" class="fa fa-link fa-lg option"></i>
                             <i id="insert-tag" class="fa fa-tag fa-lg option"></i>
                             <i id="insert-table" class="fa fa-table fa-lg option"></i>
@@ -149,8 +165,7 @@
 						</div>
 					</div>
 					<div class="tools-right">
-                        <i id="export-md" class="fa fa-download fa-lg"></i>
-						<i id="show-preview" class="fa fa-desktop fa-lg"></i>
+						<i id="show-preview" class="fas fa-desktop fa-lg"></i>
 					</div>	
 				</div> 
 				<div id="upload-file">
@@ -158,23 +173,19 @@
     					<div class="upload-type">
     						<div class="upload-btn">
     							<input class="file-upload-input-file file-upload-input" id="file-img-upload" accept="image/*" type="file" title="普通上传"/>
-    							<i class="fa fa-file-image-o fa-lg option"></i>
+    							<i class="far fa-file-image fa-lg option"></i>
     						</div>
                             <div class="upload-btn">
                                 <input class="file-upload-input-file file-upload-inputb64" id="file-img-uploadb64" accept="image/*" type="file" title="base64上传"/>
-                                <i class="fa fa-camera-retro fa-lg option"></i>
+                                <i class="fa fa-file-image fa-lg option"></i>
                             </div>
                             <div class="upload-btn">
     							<input class="file-upload-input-file file-upload-input" id="file-file-upload" accept="" type="file" title="普通上传"/>
-    							<i class="fa fa-file-o fa-lg option"></i>
+    							<i class="far fa-file fa-lg option"></i>
     						</div>
                             <div class="upload-btn">
                                 <input class="file-upload-input-file file-upload-inputb64" id="file-file-uploadb64" accept="" type="file" title="base64上传"/>
                                 <i class="fa fa-file fa-lg option"></i>
-                            </div>
-                            <div class="upload-btn">
-                                <input class="file-upload-input-file" id="file-open-md" accept="" type="file" title="base64上传"/>
-                                <i class="fa fa-upload fa-lg option"></i>
                             </div>
     					</div>
 					</div>
@@ -192,10 +203,11 @@
                 </div>
 				<div class="preview-foot">
 					<div class="tools-left">
-						<i id="del-post" class="fa fa-trash-o fa-lg"></i>
+						<i id="del-post" class="fa fa-trash-alt fa-lg"></i>
 					</div>
 					<div class="tools-right">
-						<i id="hide-preview" class="fa fa-edit fa-lg"></i>
+                        <i id="preview-goback" class="fas fa-arrow-left fa-lg fa-fw"></i>
+						<i id="hide-preview" class="fa fa-edit fa-lg fa-fw"></i>
 					</div>					
 				</div>
 			</div>
@@ -214,7 +226,6 @@
                     var ua = navigator.userAgent; 
                     var app = navigator.appVersion;
                     
-                    
                     if (!!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
                         if (ua.indexOf('iPhone') > -1) {
 
@@ -226,11 +237,16 @@
                             
                                 return 'ios_iphone_mwxb';
                             }
+                            else if (ua.indexOf('CriOS') > -1) {
+                            
+                                return 'ios_iphone_chrome';
+                            }
                             else if (navigator.standalone) {
                             
                                 return 'ios_iphone_safari_webapp';
                             }
-                        
+
+
                             return 'ios_iphone_safari';
                         }
                         else if (ua.indexOf('iPad') > -1) {
@@ -255,7 +271,12 @@
         </script>
         
         <script type="text/javascript">
-        
+            
+            $('#md-wrapper').bind('scroll', function (e) {
+                console.log($('#md-wrapper').scrollTop())
+
+            })
+
             function scrollHelper (_edit) {
             
                 this._init_ = function () {
@@ -301,6 +322,58 @@
                     }
 
                 }
+
+                this.scrollSynchro = function () {
+
+
+                    
+                    if ($('.preview').is(':hidden')) {
+
+                        /*
+                        var scrollprecent = $('#md-wrapper').scrollTop() / $('.markdown-body').height();
+
+                        
+
+                        if (this._drvtype.indexOf('ios')  > -1) {
+
+                            var scrollheight = this._editScroll.scrollerHeight;
+                            this._editScroll.scrollTo(0, scrollheight * scrollprecent, 0);
+
+                        }
+                        else {
+
+                            var scrollheight = this._edit.doc.height;
+                            this._edit.scrollTo(null, scrollheight * scrollprecent);
+
+
+                        }
+                        */
+
+
+                    }
+                    else {
+                        var scrollprecent = 0;
+                        var scrollheight = 0;
+
+                        if (this._drvtype.indexOf('ios')  > -1) {
+
+                            scrollprecent = Math.abs(this._editScroll.y) / this._editScroll.scrollerHeight;
+
+                        }
+                        else {
+
+                            scrollprecent = this._edit.doc.scrollTop / this._edit.doc.height;
+
+                        }
+
+                        var scrollheight = $('.markdown-body').height();
+
+                        $('#md-wrapper').scrollTop(scrollheight * scrollprecent);
+                    }
+                    
+                    
+
+                };
                 
                 this.refReshHtml = function () {
                     if (this._drvtype.indexOf('ios')  > -1) {
@@ -353,7 +426,7 @@
                     
                     if (this._drvtype.indexOf('ios')  > -1) {
 
-
+                        /*
                         $(".CodeMirror-code .CodeMirror-line").bind('touchstart', function () {
 
                             timeOutEvent = setTimeout(function () {
@@ -362,6 +435,7 @@
                             }.bind(this), 500);
                             //e.preventDefault();
                         });
+
 
                         $(".CodeMirror-code .CodeMirror-line").bind('touchmove', function () {
 
@@ -372,6 +446,7 @@
 
                             clearTimeout(timeOutEvent);
                         });
+                        */
                     
                         //console.log("navigator.userAgent:" + navigator.userAgent)
                         //console.log("navigator.appVersion:" + navigator.appVersion)
@@ -452,7 +527,8 @@
                         $(".content").bind('touchstart', function () {
                             if (this._edit.doc.height < $('.content').height()) {
                                 this._edit.focus();
-                                return false;
+                                //lookout this code will prevent long touch
+                                //return false;
                             }
                         }.bind(this));
                         
@@ -471,12 +547,15 @@
                             setTimeout(function () {
                                 this.autoScroll('hide_input_oninput');
                             }.bind(this), 0);
+
                         }.bind(this)).on('compositionstart', function () {
 
                             this._autoScrollHideInputCanChange = false;
+
                         }.bind(this)).on('compositionend', function () {
 
                             this._autoScrollHideInputCanChange = true;
+
                         }.bind(this));
 
                         this._onlLoadHeight();
@@ -512,7 +591,8 @@
                 };
 
                 this._checkAdditiveHeight = function () {
-                    
+
+
                     if (this._drvtype == 'ios_iphone_safari') { 
                         this._additiveHeight = 45;
                     }
@@ -783,6 +863,7 @@
                                 this._edit.replaceSelection(content);
                                 this._edit.setCursor(cursor.line, cursor.ch + content.length);
                                 this._edit.focus();
+
                             }
                         }
                         
@@ -1143,9 +1224,7 @@
 			window.onload = function () {
 				
                 initEdit();
-                                
-                
-                
+                                                
                 if ($("#postid").length == 0) {
 
                     hidePreview();
@@ -1203,8 +1282,7 @@
 
                 rendererMD.text = function(text) {
 
-
-                    if (/^.*\+\+(.+)\+\+.*/.test(text)) { 
+                    if (/.*\+\+(.+)\+\+.*/.test(text)) { 
                         var instext = text.match(/[\+]{2}(.+?)[\+]{2}/)[1];
                         //var instext = text.match(/\+\+.+?\+\+/g)[0].replace(/^\+\+|\+\+$/g, "");
                         text = text.replace(/\+\+.+?\+\+/, "<ins>" + instext + "</ins>");
@@ -1213,6 +1291,17 @@
 
                     
                     return text;
+                };
+
+                rendererMD.code = function(code, languages) {
+
+                    code = "<pre>" +
+                                "<code>" + 
+                                    hljs.highlightAuto(code).value + 
+                                "</code>" + 
+                            "</pre>"
+
+                    return code;
                 };
 
                 rendererMD.link = function(href, title, text) {
@@ -1364,8 +1453,26 @@
 				});
 
 				$('#head-goback').bind('click', function () {
-					history.go(-1);
+
+                    if (typeof(gobackurl) == 'undefined') {
+                        history.go(-1);
+                    }
+                    else {
+                        window.location.href = gobackurl;
+                    }
+					
 				});
+
+                $('#preview-goback').bind('click', function () {
+
+                    if (typeof(gobackurl) == 'undefined') {
+                        history.go(-1);
+                    }
+                    else {
+                        window.location.href = gobackurl;
+                    }
+                    
+                });
 
 				$('#show-preview').bind('click', function () {
 					//关闭软键盘
@@ -1379,6 +1486,8 @@
                     }
                     
 					showPreview();
+
+                    srh.scrollSynchro();
 				});
 
 				$('#hide-preview').bind('click', function () {
@@ -1386,6 +1495,7 @@
                     sch.autoOpenIosKey();
 					hidePreview();
                     sch.listenOrientation();
+
 
 				});
 
@@ -1885,7 +1995,7 @@
     			$('#title').blur();
 			}
 
-			function submitmd () {
+			function submitmd (_isgonext) {
 				if (typeof(issubmit) == 'undefined' || !issubmit) {
 					var post_name = $('#title').val();
 					var post_body_md = encodeURIComponent(CodeMirrorEditor.getValue());
@@ -1897,17 +2007,49 @@
 
 					$.ajax({
 						type: 'POST',
+                        async: true,
   						url: posturl,
   						data: 'name=' + post_name + '&body_md=' + post_body_md,
   						beforeSend: function () {
   							issubmit = true;
+                            $('.page-progress-bar .bar').width(0);
+                            $('.page-progress-bar').show();
   						},
+                        xhr: function (e) {
+
+                            var xhr = $.ajaxSettings.xhr();
+
+                            if (xhr.upload) { 
+
+                                xhr.upload.addEventListener('progress',function(e){
+
+                                    var percent = e.loaded / e.total * 100;
+
+                                    $('.page-progress-bar .bar').width(percent + "%");
+
+                                                                                                    
+                                }, false); // for handling the progress of the upload
+                            }
+
+                            return xhr;
+
+                            
+
+                        },
   						success: function (result) {
 
   							if (result) {
   								if (result.code == 200) {
                                     dc.clean();
-  									window.location.href = result.nexturl;
+                                    $('.page-progress-bar').hide();
+                                    $('.page-progress-bar .bar').width(0);
+                                    
+                                    if (_isgonext) {
+                                        window.location.href = result.nexturl;
+                                    }
+
+                                    gobackurl = result.nexturl;
+  									
   								}
   							}
 
