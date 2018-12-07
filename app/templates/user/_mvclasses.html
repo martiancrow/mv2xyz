@@ -26,7 +26,7 @@
     <div class="row">
         <div class="move-class-global-option">
             <div class="option-item class-add">
-                新建文件夹
+                <i class="fas fa-folder-plus"></i>新建文件夹
             </div>
             <div class="option-item class-move">
                 移动到此处
@@ -76,7 +76,11 @@
         
         <div class="class-item">
             <div class="class-name">
-                <h2><a v-bind:href="move_url">${ name }</a></h2>
+                <h2>
+                    <a v-bind:href="move_url">
+                        <i class="fas fa-folder" style="color: #FF9900"></i>&nbsp;&nbsp;${ name }
+                    </a>
+                </h2>
             </div>
             <div class="class-footer">
                 <span>${ creat }</span>

@@ -58,7 +58,7 @@ def searchkeycut(txt="", key="", strlen=0):
     dr = re.search(r"(%s)" % key, txt, flags=re.I)
 
     if dr is not None:
-        txt = txt.replace(dr.group(), "<span class='keyword'>%s</span>" % dr.group())
+        txt = txt.replace(dr.group(), "<div class='keyword'>%s</div>" % dr.group())
 
 
     return txt
@@ -91,8 +91,13 @@ def search_list():
 @user.route('/classlist/<int:classid>', methods=['GET'])
 @login_required
 def class_list(classid=None):
+
+    if not classid:
+        classid = 0
     
-    return render_template('user/classlist.html', cid=classid)
+    postclass = res_postclass.query.get(classid)
+    levelupurl = url_for('user.class_list', classid=postclass.postclass_pid) if postclass else url_for('user.class_list')
+    return render_template('user/classlist.html', cid=classid, levelupurl=levelupurl)
     
 @user.route('/moveclass/<int:classid>', methods=['GET'])
 @user.route('/moveclass/<int:classid>/<string:type>/<int:id>', methods=['GET'])
@@ -175,9 +180,12 @@ def edit_post(postid):
         abort(403)
 
     if request.method == 'POST':
+
+        nexturl = url_for('user.post_list')
     
         if 'classid' in request.form and request.form['classid'] != '':
             post.post_cid = request.form['classid']
+            nexturl = url_for('user.class_list', classid=request.form['classid'])
 
         if 'name' in request.form and request.form['name'] != '':
             post.post_name = request.form['name']
@@ -195,7 +203,7 @@ def edit_post(postid):
         result = {
             'code': 200,
             'msg': '笔记已更新',
-            'nexturl': url_for('user.post_list')
+            'nexturl': nexturl
         }
         
         return jsonify(result)
@@ -204,14 +212,13 @@ def edit_post(postid):
     content = post.post_body_md
     updatetime = post.post_updatetime.strftime("%Y/%m/%d %H:%M:%S")
 
-    return render_template('user/mdedit.html', title=title, content=content, postid=postid, updatetime=updatetime)
+    return render_template('user/mdedit.html', title=title, content=content, postid=postid, updatetime=updatetime, referer=request.referrer)
     
 @user.route('/postlistjson/<int:page>', methods=['GET'])
 @user.route('/postlistjson/<int:page>/<int:cid>', methods=['GET'])
 @login_required
 def post_list_json(page, cid=None):
-
-    if cid:
+    if cid is not None:
         pagination = res_post.query.filter_by(author_id=current_user.user.ua_user_id, post_cid=cid).order_by(res_post.post_updatetime.desc()).paginate(
             page, per_page=20, error_out=False)
     else:

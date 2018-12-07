@@ -56,7 +56,7 @@
 			.title input[type=text] {width: 100%;height: 100%;padding: 0 0 0 12px;border: 0px;font-size: 26px;line-height: 49px;box-sizing: border-box;}
 			.content {width: 100%;box-sizing: border-box;float: left;padding-left: 3px;background-color: #fff;overflow:hidden;position:relative}
             #mv2_input {display: none;}
-            #hide_input {opacity:0;position:absolute;width:0;height:0;top:-500px;}
+            #hide_input {opacity:0;position:absolute;width:0;height:0;top:-500px;left: -500px;}
 
 			/*.preview {display: block;top: 0;position: absolute;width: 100%;background-color: #fff;z-index: 999;overflow: hidden;}*/
             .preview {display: block;top: 0;position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 999;overflow: hidden;}
@@ -115,6 +115,9 @@
 			<input id="postid" type="hidden" value="{{ postid }}">
             <input id="updatetime" type="hidden" value="{{ updatetime }}">
 			{% endif %}
+            {% if referer %}
+            <input id="referer" type="hidden" value="{{ referer }}">
+            {% endif %}
             <textarea id="mv2_input">{% if content %}{{ content }}{% endif %}</textarea>
             <input id="hide_input" type="text" value=""/>
 
@@ -271,11 +274,6 @@
         </script>
         
         <script type="text/javascript">
-            
-            $('#md-wrapper').bind('scroll', function (e) {
-                console.log($('#md-wrapper').scrollTop())
-
-            })
 
             function scrollHelper (_edit) {
             
@@ -305,7 +303,7 @@
                             scrollbars: true
                         });
                         */
-                   
+                        //this._editScroll = new IScroll('#md-wrapper', {
                         this._editScroll = new IScroll('.content', {
                             preventDefault: false,
                             disableMouse: true,
@@ -399,7 +397,7 @@
         </script>
         
         <script type="text/javascript">
-        
+
             function screenHelper (_edit, _scroll) {
             
                 this._init_ = function () {
@@ -464,7 +462,6 @@
                         */
                     
                         $(window).scroll(function(event) {
-
                             if ($('.preview').is(':hidden')) {
 
                                 this._heightLoop();
@@ -656,7 +653,7 @@
                     if ($('.content').height() > this._keyoutcontentHeight) {
                     
                         if (this._firstOpenKey) {
-                            
+
                             $("body").scrollTop(this._loadinnerHeight);
                             setTimeout(function () {
                                 
@@ -946,7 +943,6 @@
                 this.onKeyChange = function (_type) {
                     
                     if (this._drvtype.indexOf('ios') > -1) {
-                    
                         if (_type == "open") {
                             this._openKey();
                         }
@@ -1214,11 +1210,22 @@
 		<script type="text/javascript">
 		
 			document.onkeydown = function () {
-				if (event.ctrlKey == true && event.keyCode == 83) {//Ctrl+S
+                console.log(event)
+                if (event.ctrlKey == true && event.keyCode == 83) {  //Ctrl+S
+                    event.returnvalue = false;
+                    submitmd();
+                    return false;
+                }
+				if (event.altKey == true && event.keyCode == 83) {  //Alt+S
         			event.returnvalue = false;
         			submitmd();
         			return false;
     			}
+                else if (event.altKey == true && event.keyCode == 69) {  //Alt+E
+                    event.returnvalue = false;
+                    operationPreview();
+                    return false;
+                }
 			};
 
 			window.onload = function () {
@@ -1278,8 +1285,6 @@
 
 				var rendererMD = new marked.Renderer();
 
-
-
                 rendererMD.text = function(text) {
 
                     if (/.*\+\+(.+)\+\+.*/.test(text)) { 
@@ -1306,16 +1311,17 @@
 
                 rendererMD.link = function(href, title, text) {
 
-                    var linkhtml = "<a href=\"{href}\" title=\"{title}\" download=\"{download}\">{text}</a>";
+                    var linkhtml = "<a href=\"{href}\" title=\"{title}\" download=\"{download}\" target=\"{target}\">{text}</a>";
 
                     linkhtml = linkhtml.replace(/\{text\}/, text);
 
                     if (/^#{1}.*/gi.test(href)) { 
-
                         linkhtml = linkhtml.replace(/download="\{download\}"/gi, '');
+                        linkhtml = linkhtml.replace(/\{target\}/, "_self");
                     }
                     else {
                         linkhtml = linkhtml.replace(/\{download\}/, text);
+                        linkhtml = linkhtml.replace(/\{target\}/, "_blank");
                     }
 
                     if (title) {
@@ -1398,10 +1404,14 @@
                 //CodeMirrorEditor.inputStyle
                 
                 CodeMirrorEditor.on('focus', function () {
-                    $('.foot').height(49);
-                    sch.setSize();
                     
+                    $('.foot').height(49);
+
+                    sch.setSize();
+
                     sch.onKeyChange("open");
+
+
                 });
                 
 				CodeMirrorEditor.on('change', function () {
@@ -1454,6 +1464,10 @@
 
 				$('#head-goback').bind('click', function () {
 
+                    if ($('#referer').length > 0) {
+                        gobackurl = $('#referer').val();
+                    }
+                    
                     if (typeof(gobackurl) == 'undefined') {
                         history.go(-1);
                     }
@@ -1465,6 +1479,10 @@
 
                 $('#preview-goback').bind('click', function () {
 
+                    if ($('#referer').length > 0) {
+                        gobackurl = $('#referer').val();
+                    }
+
                     if (typeof(gobackurl) == 'undefined') {
                         history.go(-1);
                     }
@@ -1475,28 +1493,11 @@
                 });
 
 				$('#show-preview').bind('click', function () {
-					//关闭软键盘
-					document.activeElement.blur();
-                    
-                    if (utilTools().checkDriver().indexOf("ios") > -1 || utilTools().checkDriver().indexOf("android") > -1) {
-                    
-                        $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
-                        //dc.cache(CodeMirrorEditor.getValue());
-                        srh.refReshHtml();
-                    }
-                    
-					showPreview();
-
-                    srh.scrollSynchro();
+					operationPreview();
 				});
 
 				$('#hide-preview').bind('click', function () {
-					document.activeElement.blur();
-                    sch.autoOpenIosKey();
-					hidePreview();
-                    sch.listenOrientation();
-
-
+					operationPreview();
 				});
 
 				$('#undo-btn').bind('click', function () {
@@ -1905,9 +1906,6 @@
 		    	ftlwmEnd();
 		    });
 
-
-
-
 			//鼠标坐标获取
 		    function mouseCoords(touch) {
 
@@ -1924,16 +1922,36 @@
 		    }
 
 			function showPreview() {
+                //关闭软键盘
+                document.activeElement.blur();
+
+                if (utilTools().checkDriver().indexOf("ios") > -1 || utilTools().checkDriver().indexOf("android") > -1) {
+                    $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
+                }
+
 				$('.preview').show();
-                //$(".CodeMirror").hide();
-                            
                 srh.refReshHtml();
+                srh.scrollSynchro();
 			}
 
 			function hidePreview() {
-				$('.preview').hide();
-                //$(".CodeMirror").show();
+                document.activeElement.blur();
+                sch.autoOpenIosKey();
+                $('.preview').hide();
+                sch.listenOrientation();
 			}
+
+            function operationPreview() {
+
+                if ($('.preview').is(':hidden')) { 
+
+                    showPreview();
+                    
+                }
+                else {
+                    hidePreview();
+                }
+            }
 
 			function ftlwmMove(nowmouse) {
 
@@ -2146,6 +2164,12 @@
 
 				        $('#upload-file .upload-msg .progress-txt').html('0%');
 			            $('#upload-file .upload-msg .progress-bar').width('0%');
+
+                        /*
+                        $('#upload-file').hide();
+                        $('.foot').height(49);
+                        sch.setSize();
+                        */
                         
                         
                         //sch.setSize();
@@ -2185,6 +2209,12 @@
                 CodeMirrorEditor.setCursor(cursor.line, 0);
 
                 //CodeMirrorEditor.foldCode(CodeMirror.Pos(_cursor.line, 0));
+                
+                /*
+                $('#upload-file').hide();
+                $('.foot').height(49);
+                sch.setSize();
+                */
                 
             }
 

@@ -106,8 +106,6 @@
 
         $("body").on("touchstart", ".post-item", function (_evt) {
 
-            
-
             var opt = $(this).find(".post-option");
 
             var touch;
@@ -136,8 +134,6 @@
                 }
 
             }
-
-            
         });
 
         $("body").on("touchmove", ".post-item", function (_evt) {
@@ -207,8 +203,6 @@
                     //return false;
                 }
             }
-
-
         });
 
         $("body").on("touchend", ".post-item", function (_evt) {
@@ -238,8 +232,6 @@
                 
 
             }
-
-
         });
 
         $("body").bind('touchmove', function (_evt) {
@@ -264,13 +256,11 @@
             }
         });
 
-
         $("#posts").bind('touchmove', function (_evt) {
             if (typeof (PostItemTouching) != 'undefined' && PostItemTouching) {
                 _evt.preventDefault();
                 //return false
             }
-
         });
 
         $("#posts").bind('touchend', function (_evt) {
@@ -287,12 +277,7 @@
                     }
                 }
             }
-            
-            
-
-
         });
-
 
         $("body").on("mouseenter", ".post-item", function (_evt) {
 
@@ -305,9 +290,7 @@
                     opt.css("right", 0);
                 }
 
-            }
-
-            
+            }  
         });
 
         $("body").on("mouseleave", ".post-item", function (_evt) {
@@ -330,26 +313,28 @@
             return false;
         });
 
+        /*
         $("body").on("touchstart", ".del-post", function (_evt) {
             msgpostdel($(this));
-            
             return false;
         });
+        */
 
         $("body").on("click", ".move-post", function (_evt) {
         
             showpostmoveview($(this))
 
             return false;
-            
         });
 
+        
         $("body").on("touchstart", ".move-post", function (_evt) {
             
             showpostmoveview($(this))
 
             return false;
         });
+        
 
         $(window).scroll(function () {
             var scrolltop = $(this).scrollTop();
@@ -378,7 +363,6 @@
         var optid = obj.attr('post_id');
         var cid = obj.attr('class_id');
         window.location.href = "/user/moveclass/" + cid + "/post/" + optid;
-        
     }
 
     function touchCoords(touch) {
@@ -395,18 +379,18 @@
         }
     }
 
-
-
-
     function getpost() {
 
         if (typeof(NextUri) == 'undefined') {
             NextUri = '/user/postlistjson/1'
+            NextUri += $("#classid").length > 0 ? "/" + $("#classid").val() : "";
         }
         
+        /*
         if ($('#classid').length > 0) {
             NextUri += "/" + $('#classid').val();
         }
+        */
 
         if (NextUri == null) {
             return;
@@ -449,7 +433,7 @@
 
                             $('#posts').append($('#template').html());
 
-                            $('#template').html(template_html)
+                            $('#template').html(template_html);
                         }
                     }
 
