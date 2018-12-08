@@ -13,7 +13,11 @@
         
         <div class="post-item">
             <div class="post-title">
-                <h2><a v-bind:href="url">${ title }</a></h2>
+                <h2>
+                    <a v-bind:href="url">
+                        <i class="fas fa-file" style="color: #0066CC"></i>&nbsp;&nbsp;${ title }
+                    </a>
+                </h2>
                 <span>${ update }</span>
             </div>
             <div class="post-summary">

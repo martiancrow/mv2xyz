@@ -9164,7 +9164,7 @@ function domTextBetween(cm, from, to, fromLine, toLine) {
     from = from.nextSibling;
     extraLinebreak = false;
   }
-  console.log(text)
+  //console.log(text)
   return text
 }
 

@@ -46,7 +46,7 @@
 		
 		<style type="text/css">
 			html, body {height: 100%;font-size:14px;}
-            .CodeMirror {font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+            .CodeMirror {font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;}
             .CodeMirror-gutters {border-right:0px; background-color:#fff; }
             .page-progress-bar {width: 100%;height: 2px;position: absolute;top: 0;left: 0;z-index: 9999;display: none;}
             .page-progress-bar .bar {width: 0%;height: 100%;float: left;position: relative;background-color: rgb(48, 177, 50);}
@@ -54,7 +54,7 @@
             
 			.title {width: 100%;height: 50px;overflow: hidden;border-bottom: 1px solid #ddd;float: left;background-color: #fff;box-sizing: border-box;}
 			.title input[type=text] {width: 100%;height: 100%;padding: 0 0 0 12px;border: 0px;font-size: 26px;line-height: 49px;box-sizing: border-box;}
-			.content {width: 100%;box-sizing: border-box;float: left;padding-left: 3px;background-color: #fff;overflow:hidden;position:relative}
+			.content {width: 100%;box-sizing: border-box;float: left;padding-left: 3px;background-color: #fff;overflow:hidden;position:relative;}
             #mv2_input {display: none;}
             #hide_input {opacity:0;position:absolute;width:0;height:0;top:-500px;left: -500px;}
 
@@ -413,6 +413,9 @@
                     this._enterOpenKey = true;
                     this._orientationMsg = false;
                     this._autoScrollHideInputCanChange = true;
+
+                    this._iosSeatLine = 10;
+                    this._iosSeatLineHeight = 0;
                     
                     this._drvtype = utilTools().checkDriver();
                     this._onlLoadHeight();
@@ -459,7 +462,18 @@
                             console.log("bodyHeight:" + $("body").height())
                             
                         }, 1000);
+
+                        
+
                         */
+
+                        //in ios if edit top not at view top page will shake when get focus
+                        this._edit.setCursor(0, 0);
+                        for (var i = 0; i < this._iosSeatLine; i++) {
+                            this._edit.replaceSelection('\n');
+                            this._iosSeatLineHeight += this._edit.display.view[i].line.height
+                        }
+                        $('.CodeMirror').css('margin-top', (-1 * this._iosSeatLineHeight));
                     
                         $(window).scroll(function(event) {
                             if ($('.preview').is(':hidden')) {
@@ -600,7 +614,18 @@
                 this._prevenMove = function () {
                     
                     if (this._drvtype.indexOf('ios')  > -1) {
+
+                        /*
+                        $('html').css('touch-action', 'none');
+                        $('body').css('touch-action', 'none');
+                        $('.warpper').css('touch-action', 'none');
+                        $('.head').css('touch-action', 'none');
+                        $('.title').css('touch-action', 'none');
+                        $('.content').css('touch-action', 'none');
+                        $('.foot').css('touch-action', 'none');
+                        */
                     
+                        
                         $('html').bind('touchmove', function (e) {
                             if ($('.preview').is(':hidden')) {
                                 e.preventDefault();
@@ -634,6 +659,7 @@
                         $('.foot').bind('touchmove', function (e) {
                             e.preventDefault();
                         }.bind(this));
+                        
                         
                         /*
                         $('#md-wrapper').bind('touchmove', function (e) {
@@ -742,12 +768,16 @@
                         
                         var focusHeight = 0;
 
-                        for (var i = 0; i <= cursor.line; i++) {
+                        
+                        //Mark,这里算焦点高度
+                        for (var i = this._iosSeatLine; i <= cursor.line; i++) {
+                        //for (var i = 0; i <= cursor.line; i++) {
                             focusHeight += this._edit.display.view[i].line.height;
                         }
-                                                
+                
                         var scrollHeight = Math.abs(this._scroll._editScroll.y);
                         var viewportHeight = $(".content").height();
+
                         
                         var unvpsc = function () {
                         
@@ -814,7 +844,7 @@
                             
                             //this._scroll.refReshEdit();
                         }
-                        else if (scrollHeight >= focusHeight) {
+                        else if (scrollHeight >= focusHeight && focusHeight != 0) { //focus in iosseatline
                             //upper the viewport
                             
                             if (_type == "scrollend") {
@@ -1209,28 +1239,43 @@
         
 		<script type="text/javascript">
 		
-			document.onkeydown = function () {
-                console.log(event)
-                if (event.ctrlKey == true && event.keyCode == 83) {  //Ctrl+S
-                    event.returnvalue = false;
-                    submitmd();
-                    return false;
-                }
-				if (event.altKey == true && event.keyCode == 83) {  //Alt+S
-        			event.returnvalue = false;
-        			submitmd();
-        			return false;
-    			}
-                else if (event.altKey == true && event.keyCode == 69) {  //Alt+E
-                    event.returnvalue = false;
-                    operationPreview();
-                    return false;
-                }
-			};
-
 			window.onload = function () {
 				
                 initEdit();
+
+                document.onkeydown = function () {
+
+                    if (event.ctrlKey == true && event.keyCode == 83) {  //Ctrl+S
+                        event.returnvalue = false;
+                        submitmd();
+                        return false;
+                    }
+                    if (event.altKey == true && event.keyCode == 83) {  //Alt+S
+                        event.returnvalue = false;
+                        submitmd();
+                        return false;
+                    }
+                    else if (event.altKey == true && event.keyCode == 69) {  //Alt+E
+                        event.returnvalue = false;
+                        operationPreview();
+                        return false;
+                    }
+
+                    if (utilTools().checkDriver().indexOf("ios") > -1) {
+
+                        var cursor = CodeMirrorEditor.getCursor();
+
+                        if (cursor.line <= sch._iosSeatLine && cursor.ch == 0) {
+
+                            if (event.keyCode == 8) { 
+                                return false;
+                            }
+                        }
+
+                    }
+                    
+                };
+
                                                 
                 if ($("#postid").length == 0) {
 
@@ -1392,13 +1437,13 @@
                     }
 			    });
 
-				$('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
-                
                 dc = new DocCache(CodeMirrorEditor);
                 srh = new scrollHelper(CodeMirrorEditor);
                 sch = new screenHelper(CodeMirrorEditor, srh);
                 headList = new Array();
-                getindex = false;                
+                getindex = false;      
+
+                $('.markdown-body').html(marked(codemirrorGetValue()));          
 
 				//CodeMirrorEditor.setOption('lineNumbers', true);
                 //CodeMirrorEditor.inputStyle
@@ -1418,11 +1463,11 @@
 
                     if (utilTools().checkDriver().indexOf("ios") == -1 && utilTools().checkDriver().indexOf("android") == -1) {
                     
-                        $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
+                        $('.markdown-body').html(marked(codemirrorGetValue()));
                         srh.refReshHtml();
                     }
 
-                    dc.cache(CodeMirrorEditor.getValue());
+                    dc.cache(codemirrorGetValue());
 					
 
 					var ec = CodeMirrorEditor.changeGeneration();
@@ -1456,6 +1501,13 @@
                     
                     srh.refReshEdit();
                     
+                    var cursor = CodeMirrorEditor.getCursor();
+
+                    //prevent focus into seatline
+                    if (cursor.line < sch._iosSeatLine) {
+                        CodeMirrorEditor.setCursor(sch._iosSeatLine, 0);
+                    }
+
                     setTimeout(function () {
                         sch.autoScroll();
                     }, 0);
@@ -1521,6 +1573,7 @@
 				
 
 				$('#insert-head').bind('click', function () {
+
                     sch.preventChange();
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
@@ -1529,25 +1582,25 @@
 					if (token == '# ') {
 
 						CodeMirrorEditor.replaceRange('# ' + selctx, {line: cursor.line, ch: cursor.ch - 1}, {line: cursor.line, ch: cursor.ch});
-						CodeMirrorEditor.focus();					
 						CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
 					
 					}
 					else {
 						
 						CodeMirrorEditor.replaceSelection('# ' + selctx);
-						CodeMirrorEditor.focus();					
 						CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
 					}
+
+                    codemirrorGetFocus();
 
 				});
 
 				$('#insert-bold').bind('click', function () {
-                    sch.preventChange();
+                    
+                    sch.preventChange();  //can remove
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('**' + selctx + '**')
-					CodeMirrorEditor.focus();
                     
                     if (selctx) {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 4);
@@ -1555,7 +1608,10 @@
                     else {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
                     }
-					
+
+                    
+                    codemirrorGetFocus();
+
 				});
                 
                 $('#insert-italic').bind('click', function () {
@@ -1563,7 +1619,6 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('*' + selctx + '*')
-					CodeMirrorEditor.focus();
                     
                     if (selctx) {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 4);
@@ -1571,6 +1626,8 @@
                     else {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
                     }
+
+                    codemirrorGetFocus();
 					
 				});
 
@@ -1579,7 +1636,6 @@
                     var selctx = CodeMirrorEditor.getSelection();
                     var cursor = CodeMirrorEditor.getCursor();
                     CodeMirrorEditor.replaceSelection('++' + selctx + '++')
-                    CodeMirrorEditor.focus();
                     
                     if (selctx) {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 4);
@@ -1587,6 +1643,8 @@
                     else {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
                     }
+
+                    codemirrorGetFocus();
                     
                 });
                 
@@ -1595,7 +1653,6 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('~~' + selctx + '~~')
-					CodeMirrorEditor.focus();
                     
                     if (selctx) {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 4);
@@ -1603,6 +1660,8 @@
                     else {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
                     }
+
+                    codemirrorGetFocus();
 					
 				});
 
@@ -1637,8 +1696,9 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('> ' + selctx);
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+
+                    codemirrorGetFocus();
 				});
 
 				$('#insert-indent').bind('click', function () {
@@ -1646,18 +1706,20 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('　' + selctx)
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
+
+                    codemirrorGetFocus();
+
 				});
                 
                 $('#insert-code').bind('click', function () {
                     sch.preventChange();
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
-					CodeMirrorEditor.replaceSelection('```\n' + selctx + '\n```')
-					CodeMirrorEditor.focus();	
-                    
+					CodeMirrorEditor.replaceSelection('```\n' + selctx + '\n```')                    
                     CodeMirrorEditor.setCursor(cursor.line + 1, 0);
+
+                    codemirrorGetFocus();
                     
 				});
                 
@@ -1666,8 +1728,9 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection(selctx + '\n---\n')
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line + 2, cursor.ch);
+
+                    codemirrorGetFocus();
 				});
 
 				$('#insert-list-ul').bind('click', function () {
@@ -1675,8 +1738,9 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('- ' + selctx)
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+
+                    codemirrorGetFocus();
 				});
                 
                 $('#insert-headindex').bind('click', function () {
@@ -1684,7 +1748,7 @@
 					var cursor = CodeMirrorEditor.getCursor();
                     
                     getindex = true;
-                    marked(CodeMirrorEditor.getValue());
+                    marked(codemirrorGetValue());
                     getindex = false;
                     
                     var headindex = '**目录**  \n';
@@ -1707,10 +1771,11 @@
                     }
                     
                     CodeMirrorEditor.replaceSelection(headindex)
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch);
                     
                     headList = [];
+
+                    codemirrorGetFocus();
                     
 					
 				});
@@ -1720,8 +1785,10 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('- [x] ' + selctx)
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 6);
+
+                    codemirrorGetFocus();
+
 				});
                 
                 $('#insert-square-o').bind('click', function () {
@@ -1729,16 +1796,18 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('- [ ] ' + selctx)
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 6);
+
+                    codemirrorGetFocus();
 				});
                 
                 $('#insert-link').bind('click', function () {
                     sch.preventChange();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('![连接名称](http://)')
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
+
+                    codemirrorGetFocus();
 				});
                 
                 $('#insert-tag').bind('click', function () {
@@ -1746,7 +1815,6 @@
                     var selctx = CodeMirrorEditor.getSelection();
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection('`' + selctx + '`')
-					CodeMirrorEditor.focus();	
                     
                     if (selctx) {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 2);
@@ -1754,6 +1822,8 @@
                     else {
                         CodeMirrorEditor.setCursor(cursor.line, cursor.ch + 1);
                     }
+
+                    codemirrorGetFocus();
                     
 				});
                 
@@ -1767,8 +1837,9 @@
                     
 					var cursor = CodeMirrorEditor.getCursor();
 					CodeMirrorEditor.replaceSelection(tablecode)
-					CodeMirrorEditor.focus();					
 					CodeMirrorEditor.setCursor(cursor.line + 4, 0);
+
+                    codemirrorGetFocus();
 				});
 
 				$('#foot-tools-left-wrapper').bind('mousedown', function (e) {
@@ -1926,7 +1997,7 @@
                 document.activeElement.blur();
 
                 if (utilTools().checkDriver().indexOf("ios") > -1 || utilTools().checkDriver().indexOf("android") > -1) {
-                    $('.markdown-body').html(marked(CodeMirrorEditor.getValue()));
+                    $('.markdown-body').html(marked(codemirrorGetValue()));
                 }
 
 				$('.preview').show();
@@ -2006,17 +2077,59 @@
 		        
 			}
 
-			function hideKeyboard() {
+			function hideKeyboard () {
     			document.activeElement.blur();
     			//console.log(CodeMirrorEditor)
     			//CodeMirrorEditor.blur();
     			$('#title').blur();
 			}
 
+            function codemirrorGetFocus () {
+                //in ios when editarea bottom not in brownview brown will move page for focus in view
+                if (utilTools().checkDriver().indexOf("ios") > -1) {
+
+                    /*
+                    if (CodeMirrorEditor.doc.height > 800) {
+                        CodeMirrorEditor.setSize('auto', '0px');
+                        CodeMirrorEditor.focus();
+                        CodeMirrorEditor.setSize('auto', 'auto');
+                    }
+                    else {
+                        //when doc height less than 800 upper code nothing
+                        var prescrolly = srh._editScroll.y;
+                        srh._editScroll.scrollTo(0, -1 * srh._editScroll.scrollerHeight, 0);
+                        CodeMirrorEditor.focus();
+                        srh._editScroll.scrollTo(0, prescrolly, 0);
+                    }
+                    */
+
+                    var prescrolly = srh._editScroll.y;
+                    srh._editScroll.scrollTo(0, -1 * srh._editScroll.scrollerHeight, 0);
+                    CodeMirrorEditor.focus();
+                    srh._editScroll.scrollTo(0, prescrolly, 0);
+                    
+                    
+                }
+                else {
+                    CodeMirrorEditor.focus();
+                }
+            }
+
+            function codemirrorGetValue () {
+                var editval = CodeMirrorEditor.getValue();
+
+                if (utilTools().checkDriver().indexOf("ios") > -1) {
+                    regstr = new RegExp( "^[\n]{0," + sch._iosSeatLine + "}", "gi"); 
+                    editval = editval.replace(regstr, '');
+                }
+
+                return editval;
+            }
+
 			function submitmd (_isgonext) {
 				if (typeof(issubmit) == 'undefined' || !issubmit) {
 					var post_name = $('#title').val();
-					var post_body_md = encodeURIComponent(CodeMirrorEditor.getValue());
+					var post_body_md = encodeURIComponent(codemirrorGetValue());
 					var postid = $('#postid');
 					var posturl = '/user/add';
 					if (postid.length) {
@@ -2233,7 +2346,7 @@
 
             function export_md_file() {
 
-                var mdtxt = CodeMirrorEditor.getValue();
+                var mdtxt = codemirrorGetValue();
 
                 var mdbase64 = 'data:text/plain;charset=UTF-8;base64,' + getBase64(mdtxt);
 
